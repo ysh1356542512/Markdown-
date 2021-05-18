@@ -504,3 +504,46 @@ public class HomeFragment extends Fragment {
 用户通过手机浏览器 浏览某个页面时，可以在网页上放置一个类似于"在应用中打开的按钮"，如果用户有我们的app，那么通过DeepLink就能打开相应的页面。如果没有安装，那么网站可以导航到应用程序的下载页面，引导用户安装应用程序
 
 ## WorkManger
+
+### 作用
+
+不一定在所有的手机上都起效  不同的厂家对系统的修改不同
+
+WorkManager为应用程序中那些不需要及时完成的任务提供了一个统一的解决方案，以便在神电量和用户体验之间达到一个比较好的平衡。‘
+
+### 特点
+
+1. 针对不需要及时完成的任务
+
+例如
+
+发送应用程序的日志，同步应用程序数据，备份用户数据，这些任务一般都不需要及时的完成，如果我们自己来管理这些任务，逻辑可能会非常的复杂，若API使用不恰当，可能会消耗大量的电量。
+
+2. 保证任务一定会执行
+3. 兼容范围广
+
+## Paging
+
+在分页方面提供了 统一的方案  让我们可以把更多的精力专注在业务
+
+代码上
+
+### PagedListAdapter
+
+- RecyclerView 需要搭配适配器使用，如果希望使用Paging组件，
+- 适配器需要继承自PagedListAdapter
+
+### PagedList
+
+PagedList负责通知DataSource何时获取数据，以及如何获取数据。例如，何时加载第一页/下一页，第一页加载的数量，提前多少条数据开始执行预加载等，从DataSource获取的数据存在PagedList中
+
+### DataSource
+
+在DataSoure中执行具体的数据载入工作，数据可以来自于网络，也可以来自于本地数据库’根据分页机制的不同，Paging为我们提供了三种DataSource
+
+#### PostionalDataSource
+
+#### DiffUtil
+
+#### PageKeyedDataSource
+
