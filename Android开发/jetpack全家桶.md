@@ -2,7 +2,7 @@
 
 
 
-## Lifecycle
+## ==Lifecycle==
 
 
 
@@ -68,7 +68,7 @@ ProcessLifecycleOwner.get().getLifecycle()
 
 
 
-## ViewModel
+## ==ViewModel==
 
 ### 解决问题
 
@@ -112,7 +112,7 @@ viewModel = new ViewModelProvider(this, new ViewModelProvider.AndroidViewModelFa
 
 
 
-## LiveData
+## ==LiveData==
 
 ### 介绍
 
@@ -153,7 +153,7 @@ viewModel.getCurrentSecond().observe(this, new Observer<Integer>() {
 
 
 
-## Room
+## ==Room==
 
 ### 版本跃迁
 
@@ -242,7 +242,7 @@ createFromAsset()和createFromFile()创建Room数据库
 
 放在assets目录下边 一起打包
 
-## Navigation
+## ==Navigation==
 
 
 
@@ -503,7 +503,7 @@ public class HomeFragment extends Fragment {
 
 用户通过手机浏览器 浏览某个页面时，可以在网页上放置一个类似于"在应用中打开的按钮"，如果用户有我们的app，那么通过DeepLink就能打开相应的页面。如果没有安装，那么网站可以导航到应用程序的下载页面，引导用户安装应用程序
 
-## WorkManger
+## ==WorkManger==
 
 ### 作用
 
@@ -522,7 +522,7 @@ WorkManager为应用程序中那些不需要及时完成的任务提供了一个
 2. 保证任务一定会执行
 3. 兼容范围广
 
-## Paging
+## ==Paging==
 
 在分页方面提供了 统一的方案  让我们可以把更多的精力专注在业务
 
