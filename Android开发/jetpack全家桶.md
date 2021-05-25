@@ -77,12 +77,6 @@ ProcessLifecycleOwner.get().getLifecycle()
 3. 类膨胀提高维护难度和测试难度
 4. 使数据和视图的分离 而且还能保持通
 
-
-
-
-
-
-
 ### 作用
 
 ViewModel 能够实现瞬态数据保存的原因就是
@@ -120,23 +114,16 @@ MutableLiveData  是LIveData的子类  LiveData是一个抽象类
 
 所以一般使用的是MutableLiveData
 
-
-
-
-
 ### 作用
 
 **在ViewModel数据发生变化的时候就去通知页面**
 
-<<<<<<< HEAD
-=======
 数据可以被观察者订阅
 
 能够感知组件（Fragment，Activity，Service）的生命周期
 
 只有在组件出于激活状态（STARTED，RESUMED）才会通知观察者有数据更新
 
->>>>>>> 248613b (达到)
 ### 优势
 
 1. 确保界面符合数据状态
@@ -556,8 +543,6 @@ PagedList负责通知DataSource何时获取数据，以及如何获取数据。�
 
 #### PageKeyedDataSource
 
-<<<<<<< HEAD
-=======
 ## ==DataBinding==
 
 意义：进一步解耦 
@@ -878,7 +863,5 @@ public class ImageViewBindingAdapter {
 这里用来加载xml里面的属性
 
 ```java
-app:itemImage="@{idol.image}"  //也就是xml布局里面的图片信息
+app:itemImage="@{idol.image}"  //也就是xml布局里面的图
 ```
-
->>>>>>> 248613b (达到)
