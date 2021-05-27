@@ -1,2 +1,0 @@
-![ScreenClip](AMS.assets/ScreenClip-1622077929197.png)
-
