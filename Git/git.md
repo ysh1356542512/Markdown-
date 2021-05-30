@@ -140,7 +140,7 @@ git pull [远程主机名] [远程分支名]:[本地分支名] 相当于先执�
 
 ## 报错
 
-==fatal: refusing to merge unrelated histories==
+### ==fatal: refusing to merge unrelated histories==
 
 出现这个问题的最主要原因还是在于本地仓库和远程仓库实际上是独立的两个仓库。假如我之前是直接clone的方式在本地建立起远程github仓库的克隆本地仓库就不会有这问题了。
 
@@ -148,3 +148,10 @@ git pull [远程主机名] [远程分支名]:[本地分支名] 相当于先执�
 ```git
 git pull origin main --allow-unrelated-histories
 ```
+
+#### OpenSSL SSL_read: Connection was reset, errno 10054 
+
+```git
+git config --global http.sslVerify false
+```
+
