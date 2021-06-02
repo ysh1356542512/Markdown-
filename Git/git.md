@@ -149,7 +149,7 @@ git pull [远程主机名] [远程分支名]:[本地分支名] 相当于先执�
 git pull origin main --allow-unrelated-histories
 ```
 
-#### OpenSSL SSL_read: Connection was reset, errno 10054 
+#### OpenSSL SSL_read: Connection was reset, errno 10054
 
 ```git
 git config --global http.sslVerify false

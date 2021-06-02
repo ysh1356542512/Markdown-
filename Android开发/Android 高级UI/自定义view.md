@@ -67,6 +67,7 @@ public static int getChildMeasureSpec(int spec, int padding, int childDimension)
         int resultMode = 0;
 
         switch (specMode) {
+                
         //当父View要求一个精确值时，为子View赋值
         case MeasureSpec.EXACTLY:
             //如果子view有自己的尺寸，则使用自己的尺寸
