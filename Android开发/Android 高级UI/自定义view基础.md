@@ -1,7 +1,3 @@
-
-
-
-
 # ==分类==
 
 自定义View的实现方式有以下几种
@@ -28,6 +24,10 @@ View的绘制基本由measure()、layout()、draw()这个三个函数完成
 
 ## Measure()
 
+
+
+
+
 ### MeasureSpec
 
 `MeasureSpec`是View的==内部类==，它封装了一个View的尺寸，在`onMeasure()`当中会根据这个`MeasureSpec`的值来确定View的宽高。
@@ -47,6 +47,8 @@ View的绘制基本由measure()、layout()、draw()这个三个函数完成
 
 #### 使用方式
 
+
+
 ```java
     // 获取测量模式（Mode）
     int specMode = MeasureSpec.getMode(measureSpec)
@@ -57,6 +59,8 @@ View的绘制基本由measure()、layout()、draw()这个三个函数完成
 ```
 
 ####  getChildMeasureSpec
+
+
 
 ```java
 public static int getChildMeasureSpec(int spec, int padding, int childDimension) {
@@ -2576,6 +2580,207 @@ canvas.drawTextOnPath("最喜欢看曹神日狗了~", path, 50, 50, mPaint);    
 
 ![img](https://www.runoob.com/wp-content/uploads/2015/10/18888589.jpg)
 
+
+
+##### 绘制横线和竖线
+
+```java
+public void drawLine(float startX, float startY, float stopX, float stopY, @NonNull Paint paint) {
+        throw new RuntimeException("Stub!");
+    }
+
+```
+
+| [Canvas.drawLine](https://developer.android.com/reference/android/graphics/Canvas#drawLine(float, float, float, float, android.graphics.Paint))参数 | 描述        |
+| ------------------------------------------------------------ | ----------- |
+| startX                                                       | x轴起始坐标 |
+| startY                                                       | y轴起始坐标 |
+| stopX                                                        | x轴终止坐标 |
+| stopY                                                        | y轴终止坐标 |
+| paint                                                        | Paint       |
+
+| Paint的set方法                                               | 描述                                                         |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| paint.[setStyle](https://developer.android.com/reference/android/graphics/Paint#setStyle(android.graphics.Paint.Style)) | 填充方式，默认FILL填充，还有STROKE描边，FILL_AND_STROKE填充并描边 |
+| paint.[setColor](https://developer.android.com/reference/android/graphics/Paint#setColor(long)) | 设置颜色                                                     |
+| paint.[setStrokeWidth](https://developer.android.com/reference/android/graphics/Paint#setStrokeWidth(float)) | 设置宽度                                                     |
+| paint.setAntiAlias                                           | 防锯齿                                                       |
+
+
+
+
+
+演示：
+
+```java
+  /**
+     * 绘制x轴的中间竖线
+     */
+    private void drawCenterLineX(Canvas canvas){
+        Paint paint = new Paint();
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.BLUE);
+        paint.setStrokeWidth(2);
+        canvas.drawLine(getWidth()/2, 0, getWidth()/2, getHeight(), paint);
+    }
+
+    /**
+     * 绘制y轴的中间横线
+     */
+    private void drawCenterLineY(Canvas canvas){
+        Paint paint = new Paint();
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.BLUE);
+        paint.setStrokeWidth(2);
+        canvas.drawLine(0, getHeight()/2, getWidth(), getHeight()/2, paint);
+    }
+
+```
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210529185151140.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3lhbjEzNTA3MDAxNDcw,size_16,color_FFFFFF,t_70)
+
+
+
+#####  绘制文本
+
+```java
+public void drawText(@NonNull String text, float x, float y, @NonNull Paint paint) {
+        throw new RuntimeException("Stub!");
+    }
+```
+
+| [Canvas.drawText](https://developer.android.com/reference/android/graphics/Canvas#drawText(java.lang.String, float, float, android.graphics.Paint))参数 | 描述                                |
+| ------------------------------------------------------------ | ----------------------------------- |
+| text                                                         | 需要绘制的文本内容                  |
+| x                                                            | 正在绘制的文本原点的 x 坐标         |
+| y                                                            | 正在绘制的文本基线baseLine的 y 坐标 |
+| paint                                                        | Paint                               |
+
+
+
+| Paint的方法                                                  | 描述                                                         |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| paint.[setStyle](https://developer.android.com/reference/android/graphics/Paint#setStyle(android.graphics.Paint.Style)) | 填充方式，默认FILL填充，还有STROKE描边，FILL_AND_STROKE填充并描边 |
+| paint.[setTextSize](https://developer.android.com/reference/android/graphics/Paint#setTextSize(float)) | 文本大小，以像素为单位                                       |
+| paint.[setTextAlign](https://developer.android.com/reference/android/graphics/Paint#setTextAlign(android.graphics.Paint.Align)) | 设置对齐方式                                                 |
+| paint.[getFontSpacing](https://developer.android.com/reference/android/graphics/Paint#getFontSpacing()) | 获取行间距                                                   |
+
+```java
+  @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+
+        drawCenterLineX(canvas);
+        drawCenterLineY(canvas);
+
+        String text = "绘制文本";
+
+        // 绘制文本
+        Paint paint = new Paint();
+        paint.setTextSize(100); // 文字大小
+        float x = 0;
+        float baseLine = 100;
+        canvas.drawText(text, x, baseLine, paint);
+
+        // 绘制文本 - 文本对齐 - 左
+        paint.setTextSize(100); // 文字大小
+        paint.setTextAlign(Paint.Align.LEFT); // 默认值LEFT
+        x = getWidth() / 2;
+        baseLine = 100 + paint.getFontSpacing();
+        canvas.drawText(text, x, baseLine, paint);
+
+        // 绘制文本 - 文本对齐 - 中
+        paint.setTextSize(100); // 文字大小
+        paint.setTextAlign(Paint.Align.CENTER); // 默认值LEFT
+        x = getWidth() / 2;
+        baseLine = 100 + paint.getFontSpacing() * 2;
+        canvas.drawText(text, x, baseLine, paint);
+
+        // 绘制文本 - 文本对齐 - 右
+        paint.setTextSize(100); // 文字大小
+        paint.setTextAlign(Paint.Align.RIGHT); // 默认值LEFT
+        x = getWidth() / 2;
+        baseLine = 100 + paint.getFontSpacing() * 3;
+        canvas.drawText(text, x, baseLine, paint);
+    }
+
+```
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210529190145130.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3lhbjEzNTA3MDAxNDcw,size_16,color_FFFFFF,t_70)
+
+
+
+**上下左右居中**
+
+| Paint的方法                                                  | 描述           |
+| ------------------------------------------------------------ | -------------- |
+| paint.[measureText](https://developer.android.com/reference/android/graphics/Paint#measureText(java.lang.String)) | 测量文本的宽度 |
+
+| Paint.[FontMetrics](https://developer.android.com/reference/android/graphics/Paint.FontMetrics#ascent) | 描述                                             |
+| ------------------------------------------------------------ | ------------------------------------------------ |
+| ascent                                                       | 单行距文本基线上方的推荐距离。                   |
+| descent                                                      | 单行距文本基线下方的推荐距离。                   |
+| leading                                                      | 建议在文本行之间添加额外空间。                   |
+| bottom                                                       | 给定文本大小下字体中最低字形基线下方的最大距离。 |
+| top                                                          | 给定文本大小的字体中最高字形基线上方的最大距离。 |
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210529195719865.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3lhbjEzNTA3MDAxNDcw,size_16,color_FFFFFF,t_70)
+
+```java
+  // 绘制文本 - 上下左右居中
+        paint.setTextSize(100);
+        paint.setColor(Color.RED);
+        paint.setTextAlign(Paint.Align.LEFT);
+        
+        x = getWidth()/2 - paint.measureText(text)/2;
+        
+        Paint.FontMetrics fontMetrics = paint.getFontMetrics();
+        baseLine = getHeight()/2 - (fontMetrics.descent + fontMetrics.ascent)/2;
+        
+        canvas.drawText(text, x, baseLine, paint);
+
+```
+
+
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/2021052919502081.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3lhbjEzNTA3MDAxNDcw,size_16,color_FFFFFF,t_70)
+
+**图层**
+
+```java
+ @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        
+        canvas.save();
+        
+        String text = "绘制文本";
+        Paint paint = new Paint();
+        paint.setTextSize(100); // 文字大小
+        paint.setTextAlign(Paint.Align.LEFT); // 默认值LEFT
+        paint.setColor(Color.RED);
+        paint.setAntiAlias(true); // 防锯齿
+        float x = 0;
+        float baseLine = 100;
+        canvas.drawText(text, x, baseLine, paint);
+
+        canvas.restore();
+    }
+
+```
+
+##### 资源：
+
+  [TestDrawText](https://github.com/YanKuan-IT/TestDrawText)
+
+
+
+
+
+
+
+
+
 #### 绘制自定义的图形
 
 ```java
@@ -3045,63 +3250,976 @@ public class CaClothes extends AppCompatActivity implements View.OnTouchListener
 
 ------
 
+# ==Drawable==
+
+从本节开始我们来学习Android中绘图与动画中的一些基础知识，为我们进阶部分的自定义 打下基础！而第一节我们来扣下Android中的Drawable！Android中给我们提供了多达13种的 Drawable，本节我们就来一个个撸一遍！
+
+![img](https://www.runoob.com/wp-content/uploads/2015/10/57840489.jpg)
+
+## 注意事项
+
+> - Drawable分为两种： 一种是我们**普通的图片资源**，在Android Studio中我们一般放到res/mipmap目录下， 和以前的Eclipse不一样哦！另外我们如果把工程切换成Android项目模式，我们直接 往mipmap目录下丢图片即可，AS会自动分hdpi，xhdpi...！ 另一种是我们编写的**XML形式的Drawable资源**，我们一般把他们放到res/drawable目录 下，比如最常见的按钮点击背景切换的Selctor！
+> - 在XML我们直接通过@mipmap或者@drawable设置Drawable即可 比如: android:background = "@mipmap/iv_icon_zhu"   /  "@drawable/btn_back_selctor" 而在Java代码中我们可以通过Resource的getDrawable(R.mipmap.xxx)可以获得drawable资源 如果是为某个控件设置背景，比如ImageView，我们可以直接调用控件.getDrawale()同样 可以获得drawable对象！
+> - Android中drawable中的资源名称有约束，必须是：**[a-z0-9_.]**（即：只能是字母数字及*和.）， 而且不能以数字开头，否则编译会报错： Invalid file name: must contain only [a-z0-9*.]！ 小写啊！！！！小写！！！小写！——重要事情说三遍~
+
+## ColorDrawable
+
+最简单的一种Drawable，当我们将ColorDrawable绘制到Canvas(画布)上的时候, 会使用一种固定的颜色来填充Paint,然后在画布上绘制出一片单色区域!
+
+### Java
+
+```java
+ColorDrawable drawable = new ColorDrawable(0xffff2200);  
+txtShow.setBackground(drawable);  
+```
+
+### xml
+
+```java
+<?xml version="1.0" encoding="utf-8"?>  
+<color  
+    xmlns:android="http://schemas.android.com/apk/res/android"  
+    android:color="#FF0000"/>  
+```
+
+当然上面这些用法,其实用得不多,更多的时候我们是在res/values目录下创建一个color.xml 文件,然后把要用到的颜色值写到里面,需要的时候通过@color获得相应的值，比如：
+
+==建立一个color.xml文件==
+
+比如：
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>  
+<resources>  
+    <color name="material_grey_100">#fff5f5f5</color>
+    <color name="material_grey_300">#ffe0e0e0</color>
+    <color name="material_grey_50">#fffafafa</color>
+    <color name="material_grey_600">#ff757575</color>
+    <color name="material_grey_800">#ff424242</color>
+    <color name="material_grey_850">#ff303030</color>
+    <color name="material_grey_900">#ff212121</color>
+</resources>
+```
+
+然后如果是在xml文件中话我们可以通过@color/xxx获得对应的color值 如果是在Java中:
+
+```java
+int mycolor = getResources().getColor(R.color.mycolor);    
+btn.setBackgroundColor(mycolor);  
+```
+
+ps:另外有一点要注意,如果我们在Java中直接定义颜色值的话,要加上0x,而且不能把透明度漏掉:
+
+```java
+int mycolor = 0xff123456;    
+btn.setBackgroundColor(mycolor); 
+```
+
+### 系统
+
+比如:BLACK(黑色),BLUE(蓝色),CYAN(青色),GRAY(灰色),GREEN(绿色),RED(红色),WRITE(白色),YELLOW(黄色)! 用法： **btn.setBackgroundColor(Color.BLUE);** 也可以获得系统颜色再设置：
+
+```java
+int getcolor = Resources.getSystem().getColor(android.R.color.holo_green_light);  
+btn.setBackgroundColor(getcolor);  
+```
+
+xml中使用:**android:background="@android:color/black"**
+
+### 静态argb
+
+> Android使用一个int类型的数据表示颜色值,通常是十六进制,即0x开头， 颜色值的定义是由透明度alpha和RGB(红绿蓝)三原色来定义的,以"#"开始,后面依次为: 
+>  **透明度-红-绿-蓝**;eg:#RGB    #ARGB  #RRGGBB  #AARRGGBB 
+>  每个要素都由一个字节(8 bit)来表示,所以取值范围为0~255,在xml中设置颜色可以忽略透明度, 但是如果你是在Java代码中的话就需要明确指出透明度的值了,省略的话表示完全透明,这个时候 就没有效果了哦~比如:0xFF0000虽然表示红色,但是如果直接这样写,什么的没有,而应该这样写: 0xFFFF0000,记Java代码设置颜色值,需要在前面添加上透明度~ 示例:(参数依次为:透明度,红色值,绿色值,蓝色值) **txtShow.setBackgroundColor(Color.argb(0xff, 0x00, 0x00, 0x00));**
+
+## NiewPatchDrawable
+
+> 就是.9图咯，在前面我们[1.6 .9(九妹)图片怎么玩](http://www.runoob.com/w3cnote/android-tutorial-9-image.html)已经详细 的给大家讲解了一下如何制作.9图片了！Android FrameWork在显示点九图时使用了高效的 图形优化算法,我们不需要特殊的处理，就可以实现图片拉伸的自适应~ 另外在使用AS的时候要注意以下几点：
+>
+> - 1.点9图不能放在mipmap目录下，而需要放在drawable目录下！
+> - 2.AS中的.9图，必须要有黑线，不然编译都不会通过，今早我的阿君表哥在群里说 他司的美工给了他一个没有黑线的.9图，说使用某软件制作出来的，然后在Eclipse上 是可以用的，没错是没黑线的.9，卧槽，然而我换到AS上，直接编译就不通过了！ 感觉是AS识别.9图的其中标准是需要有黑店或者黑线！另外表哥给出的一个去掉黑线的： [9patch(.9)怎么去掉自己画上的黑点/黑线](https://www.runoob.com/w3cnote/9patch-9-remove-black-line.html) 具体我没试，有兴趣可以自己试试，但是黑线真的那么碍眼么...我没强迫症不觉得！ 另外还有一点就是解压别人apk，拿.9素材的时候发现并没有黑线，同样也会报错！ 想要拿出有黑线的.9素材的话，需要反编译apk而非直接解压！！！反编译前面也 介绍过了，这里就不详述了！
+
+接着介绍两个没什么卵用的东东：
+
+### xml
+
+```java
+<!--pic9.xml-->  
+<!--参数依次为:引用的.9图片,是否对位图进行抖动处理-->  
+<?xml version="1.0" encoding="utf-8"?>  
+<nine-patch  
+    xmlns:android="http://schemas.android.com/apk/res/android"  
+    android:src="@drawable/dule_pic"  
+    android:dither="true"/>  
+```
+
+**使用Bitmap包装.9图片**:
+
+```java
+<!--pic9.xml-->  
+<!--参数依次为:引用的.9图片,是否对位图进行抖动处理-->  
+<?xml version="1.0" encoding="utf-8"?>  
+<bitmap  
+    xmlns:android="http://schemas.android.com/apk/res/android"  
+    android:src="@drawable/dule_pic"  
+    android:dither="true"/>
+```
+
+## ShapeDrawable
+
+> 形状的Drawable咯,定义基本的几何图形,如(矩形,圆形,线条等),根元素是<shape../> 节点比较多，相关的节点如下：
+>
+> - ① <**shape**>:
+> - ~ **visible**:设置是否可见
+> - ~ **shape**:形状,可选:rectangle(矩形,包括正方形),oval(椭圆,包括圆),line(线段),ring(环形)
+> - ~ **innerRadiusRatio**:当shape为ring才有效,表示环内半径所占半径的比率,如果设置了innerRadius, 他会被忽略
+> - ~ **innerRadius**:当shape为ring才有效,表示环的内半径的尺寸
+> - ~ **thicknessRatio**:当shape为ring才有效,表环厚度占半径的比率
+> - ~ **thickness**:当shape为ring才有效,表示环的厚度,即外半径与内半径的差
+> - ~ **useLevel**:当shape为ring才有效,表示是否允许根据level来显示环的一部分
+> - ②<**size**>:
+> - ~ **width**:图形形状宽度
+> - ~ **height**:图形形状高度
+> - ③<**gradient**>：后面GradientDrawable再讲~
+> - ④<**solid**>
+> - ~ **color**:背景填充色,设置solid后会覆盖gradient设置的所有效果!!!!!!
+> - ⑤<**stroke**>
+> - ~ **width**:边框的宽度
+> - ~ **color**:边框的颜色
+> - ~ **dashWidth**:边框虚线段的长度
+> - ~ **dashGap**:边框的虚线段的间距
+> - ⑥<**conner**>
+> - ~ **radius**:圆角半径,适用于上下左右四个角
+> - ~ **topLeftRadius**,**topRightRadius**,**BottomLeftRadius**,**tBottomRightRadius**: 依次是左上,右上,左下,右下的圆角值,按自己需要设置!
+> - ⑦<**padding**>
+> - left,top,right,bottm:依次是左上右下方向上的边距!
+
+**使用示例**： [2.3.1 TextView(文本框)详解](http://www.runoob.com/w3cnote/android-tutorial-textview.html)![img](https://www.runoob.com/wp-content/uploads/2015/10/36413391.jpg)
+
+## GradientDrawable
+
+> 一个具有渐变区域的Drawable，可以实现线性渐变,发散渐变和平铺渐变效果 核心节点：<**gradient**/>，有如下可选属性：
+>
+> - **startColor**:渐变的起始颜色
+> - **centerColor**:渐变的中间颜色
+> - **endColor**:渐变的结束颜色
+> - **type**:渐变类型,可选(**linear**,**radial**,**sweep**), **线性渐变**(可设置渐变角度),发散渐变(中间向四周发散),平铺渐变
+> - **centerX**:渐变中间亚瑟的x坐标,取值范围为:0~1
+> - **centerY**:渐变中间颜色的Y坐标,取值范围为:0~1
+> - **angle**:只有linear类型的渐变才有效,表示渐变角度,必须为45的倍数哦
+> - **gradientRadius**:只有radial和sweep类型的渐变才有效,radial必须设置,表示渐变效果的半径
+> - **useLevel**:判断是否根据level绘制渐变效果
+
+**代码示例**：(三种渐变效果的演示)：
+
+**运行效果图**：![img](https://www.runoob.com/wp-content/uploads/2015/10/13354775.jpg)
+
+先在drawable下创建三个渐变xml文件：
+
+**(线性渐变)gradient_linear.xml**:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<shape
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval" >
+    <gradient
+        android:angle="90"
+        android:centerColor="#FFEB82"
+        android:endColor="#35B2DE"
+        android:startColor="#DEACAB" />
+
+    <stroke
+        android:dashGap="5dip"
+        android:dashWidth="4dip"
+        android:width="3dip"
+        android:color="#fff" />
+</shape>
+```
+
+**(发散渐变)gradient_radial.xml**:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:innerRadius="0dip"
+    android:shape="ring"
+    android:thickness="70dip"
+    android:useLevel="false" >
+
+    <gradient
+        android:centerColor="#FFEB82"
+        android:endColor="#35B2DE"
+        android:gradientRadius="70"
+        android:startColor="#DEACAB"
+        android:type="radial"
+        android:useLevel="false" />
+
+</shape> 
+```
+
+**(平铺渐变)gradient_sweep.xml**:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:innerRadiusRatio="8"
+    android:shape="ring"
+    android:thicknessRatio="3"
+    android:useLevel="false" >
+
+    <gradient
+        android:centerColor="#FFEB82"
+        android:endColor="#35B2DE"
+        android:startColor="#DEACAB"
+        android:type="sweep"
+        android:useLevel="false" />
+
+</shape> 
+```
+
+调用三个drawable的**activity_main.xml**:
+
+```xml
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/txtShow1"
+        android:layout_width="200dp"
+        android:layout_height="100dp"
+        android:background="@drawable/gradient_linear" />
+
+    <TextView
+        android:id="@+id/txtShow2"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:background="@drawable/gradient_radial" />
+
+    <TextView
+        android:id="@+id/txtShow3"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:background="@drawable/gradient_sweep" />
+
+</LinearLayout>  
+```
+
+好的，就是那么简单~当然，如果想绘制更加复杂的图形的话,只用xml文件不远远不足的, 更复杂的效果则需要通过Java代码来完成,下面演示的是摘自网上的一个源码:
+
+运行效果图：
+
+**实现代码**：
+
+**MainActivity.java**：
+
+```java
+public class MainActivity extends AppCompatActivity {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(new SampleView(this));
+    }
+
+    private static class SampleView extends View {
+        private ShapeDrawable[] mDrawables;
+
+        private static Shader makeSweep() {
+            return new SweepGradient(150, 25,
+                    new int[] { 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFFFF0000 },
+                    null);
+        }
+
+        private static Shader makeLinear() {
+            return new LinearGradient(0, 0, 50, 50,
+                    new int[] { 0xFFFF0000, 0xFF00FF00, 0xFF0000FF },
+                    null, Shader.TileMode.MIRROR);
+        }
+
+        private static Shader makeTiling() {
+            int[] pixels = new int[] { 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0};
+            Bitmap bm = Bitmap.createBitmap(pixels, 2, 2,
+                    Bitmap.Config.ARGB_8888);
+
+            return new BitmapShader(bm, Shader.TileMode.REPEAT,
+                    Shader.TileMode.REPEAT);
+        }
+
+        private static class MyShapeDrawable extends ShapeDrawable {
+            private Paint mStrokePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+            public MyShapeDrawable(Shape s) {
+                super(s);
+                mStrokePaint.setStyle(Paint.Style.STROKE);
+            }
+
+            public Paint getStrokePaint() {
+                return mStrokePaint;
+            }
+
+            @Override protected void onDraw(Shape s, Canvas c, Paint p) {
+                s.draw(c, p);
+                s.draw(c, mStrokePaint);
+            }
+        }
+
+        public SampleView(Context context) {
+            super(context);
+            setFocusable(true);
+
+            float[] outerR = new float[] { 12, 12, 12, 12, 0, 0, 0, 0 };
+            RectF inset = new RectF(6, 6, 6, 6);
+            float[] innerR = new float[] { 12, 12, 0, 0, 12, 12, 0, 0 };
+
+            Path path = new Path();
+            path.moveTo(50, 0);
+            path.lineTo(0, 50);
+            path.lineTo(50, 100);
+            path.lineTo(100, 50);
+            path.close();
+
+            mDrawables = new ShapeDrawable[7];
+            mDrawables[0] = new ShapeDrawable(new RectShape());
+            mDrawables[1] = new ShapeDrawable(new OvalShape());
+            mDrawables[2] = new ShapeDrawable(new RoundRectShape(outerR, null,
+                    null));
+            mDrawables[3] = new ShapeDrawable(new RoundRectShape(outerR, inset,
+                    null));
+            mDrawables[4] = new ShapeDrawable(new RoundRectShape(outerR, inset,
+                    innerR));
+            mDrawables[5] = new ShapeDrawable(new PathShape(path, 100, 100));
+            mDrawables[6] = new MyShapeDrawable(new ArcShape(45, -270));
+
+            mDrawables[0].getPaint().setColor(0xFFFF0000);
+            mDrawables[1].getPaint().setColor(0xFF00FF00);
+            mDrawables[2].getPaint().setColor(0xFF0000FF);
+            mDrawables[3].getPaint().setShader(makeSweep());
+            mDrawables[4].getPaint().setShader(makeLinear());
+            mDrawables[5].getPaint().setShader(makeTiling());
+            mDrawables[6].getPaint().setColor(0x88FF8844);
+
+            PathEffect pe = new DiscretePathEffect(10, 4);
+            PathEffect pe2 = new CornerPathEffect(4);
+            mDrawables[3].getPaint().setPathEffect(
+                    new ComposePathEffect(pe2, pe));
+
+            MyShapeDrawable msd = (MyShapeDrawable)mDrawables[6];
+            msd.getStrokePaint().setStrokeWidth(4);
+        }
+
+        @Override protected void onDraw(Canvas canvas) {
+
+            int x = 10;
+            int y = 10;
+            int width = 400;
+            int height = 100;
+
+            for (Drawable dr : mDrawables) {
+                dr.setBounds(x, y, x + width, y + height);
+                dr.draw(canvas);
+                y += height + 5;
+            }
+        }
+    }
+}
+```
 
 
 
+代码使用了ShapeDrawable和PathEffect,前者是对普通图形的包装;包括: ArcShape,OvalShape,PathShape,RectShape,RoundRectShape!
+ 而PathEffect则是路径特效,包括:CornerPathEffect,DashPathEffect和DiscretePathEffect 可以制作复杂的图形边框...
+ 关于这个GradoemtDrawable渐变就讲到这里,如果你对最后面这个玩意有兴趣的话,可以到: [appium/android-apidemos](https://github.com/appium/android-apidemos/tree/master/src/io/appium/android/apis/graphics)
+
+![img](https://www.runoob.com/wp-content/uploads/2015/10/57914902.jpg)
+
+## BitmapDrawable
+
+> 对Bitmap的一种封装,可以设置它包装的bitmap在BitmapDrawable区域中的绘制方式,有: 平铺填充,拉伸填或保持图片原始大小!以<**bitmap**>为根节点! 可选属性如下：
+>
+> - **src**:图片资源~
+> - **antialias**:是否支持抗锯齿
+> - **filter**:是否支持位图过滤,支持的话可以是图批判显示时比较光滑
+> - **dither**:是否对位图进行抖动处理
+> - **gravity**:若位图比容器小,可以设置位图在容器中的相对位置
+> - **tileMode**:指定图片平铺填充容器的模式,设置这个的话,gravity属性会被忽略,有以下可选值:             **disabled**(整个图案拉伸平铺),**clamp**(原图大小),             **repeat**(平铺),**mirror**(镜像平铺)
+>
+> 对应的效果图：
+>
+> ![img](https://www.runoob.com/wp-content/uploads/2015/10/98559776.jpg)
+
+**①XML定义BitmapDrawable**:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>  
+<bitmap xmlns:android="http://schemas.android.com/apk/res/android"  
+    android:dither="true"  
+    android:src="@drawable/ic_launcher"  
+    android:tileMode="mirror" />
+```
+
+**②实现相同效果的Java代码**:
+
+```java
+BitmapDrawable bitDrawable = new BitmapDrawable(bitmap);  
+bitDrawable.setDither(true);  
+bitDrawable.setTileModeXY(TileMode.MIRROR,TileMode.MIRROR);  
+```
+
+## InsetDrawable
+
+表示把一个Drawable嵌入到另外一个Drawable的内部，并且在内部留一些间距, 类似与Drawable的padding属性,但**padding**表示的是**Drawable的内容与Drawable本身的边距**! 而**InsetDrawable**表示的是**两个Drawable与容器之间的边距**,当控件需要的**背景比实际的边框 小的时候**,比较适合使用InsetDrawable,比如使用这个可以解决我们自定义Dialog与屏幕之间 的一个间距问题,相信做过的朋友都知道,即使我们设置了layout_margin的话也是没用的,这个 时候就可以用到这个InsetDrawable了!只需为InsetDrawable设置一个insetXxx设置不同 方向的边距,然后为设置为Dialog的背景即可！
+
+相关属性如下：
+
+> - 1.**drawable**:引用的Drawable,如果为空,必须有一个Drawable类型的子节点!
+> - 2.**visible**:设置Drawable是否额空间
+> - 3.**insetLeft**,**insetRight**,**insetTop**,**insetBottm**:设置左右上下的边距
+
+**①XML中使用**:
+
+```java
+<?xml version="1.0" encoding="utf-8"?>  
+<inset xmlns:android="http://schemas.android.com/apk/res/android"  
+    android:drawable="@drawable/test1"  
+    android:insetBottom="10dp"  
+    android:insetLeft="10dp"  
+    android:insetRight="10dp"  
+    android:insetTop="10dp" /> 
+```
+
+**在Java代码中使用**：
+
+```java
+InsetDrawable insetDrawable = new InsetDrawable(getResources()  
+        .getDrawable(R.drawable.test1), 10, 10, 10, 10); 
+```
+
+**使用效果图**：![img](https://www.runoob.com/wp-content/uploads/2015/10/22768448.jpg)
+
+## ClipDrawable
+
+Clip可以译为剪的意思,我们可以把ClipDrawable理解为从位图上剪下一个部分; Android中的进度条就是使用ClipDrawable来实现的,他根据设置level的值来决定剪切 区域的大小,根节点是<**clip**>
+
+**相关属性如下**：
+
+> - **clipOrietntion**:设置剪切的方向,可以设置水平和竖直2个方向
+> - **gravity**:从那个位置开始裁剪
+> - **drawable**:引用的drawable资源,为空的话需要有一个Drawable类型的子节点 ps:这个Drawable类型的子节点:就是在<clip里>加上这样的语句: 这样...
+
+**使用示例**：
+
+核心：通过代码修改ClipDrawable的level的值！Level的值是0~10000！
+
+**运行效果图**：![img](https://www.runoob.com/wp-content/uploads/2015/10/44267367.jpg)
+
+**代码实现**：
+
+**①定义一个ClipDrawable的资源xml**:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<clip xmlns:android="http://schemas.android.com/apk/res/android"
+    android:clipOrientation="horizontal"
+    android:drawable="@mipmap/ic_bg_meizi"
+    android:gravity="left" /> 
+```
+
+**②在activity_main主布局文件中设置一个ImageView,将src设置为clipDrawable!** **记住是src哦,如果你写成了blackground的话可是会报空指针的哦!!!!**
+
+```xml
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/img_show"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/clip_bg" />
+
+</LinearLayout>  
+```
+
+**③MainActivity.java通过setLevel设置截取区域大小**:
+
+```
+public class MainActivity extends AppCompatActivity {
+
+    private ImageView img_show;
+    private ClipDrawable cd;
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.what == 0x123) {
+                cd.setLevel(cd.getLevel() + 500);
+            }
+        }
+    };
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        img_show = (ImageView) findViewById(R.id.img_show);
+        // 核心实现代码
+        cd = (ClipDrawable) img_show.getDrawable();
+        final Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                handler.sendEmptyMessage(0x123);
+                if (cd.getLevel() >= 10000) {
+                    timer.cancel();
+                }
+            }
+        }, 0, 300);
+    }
+}
+```
+
+好的，有点意思，妹子图别问我拿，百度
+
+## RotateDrawable
+
+> 用来对Drawable进行旋转,也是通过setLevel来控制旋转的,最大值也是:10000
+
+**相关属性如下**：
+
+> - **fromDegrees**:起始的角度,,对应最低的level值,默认为0
+> - **toDegrees**:结束角度,对应最高的level值,默认360
+> - **pivotX**:设置参照点的x坐标,取值为0~1,默认是50%,即0.5
+> - **pivotY**:设置参照点的Y坐标,取值为0~1,默认是50%,即0.5 ps:如果出现旋转图片显示不完全的话可以修改上述两个值解决!
+> - **drawable**:设置位图资源
+> - **visible**:设置drawable是否可见!
+
+**角度图如下**：
+
+![img](https://www.runoob.com/wp-content/uploads/2015/10/70168328.jpg)
+
+**使用示例**：
+
+**运行效果图**：![img](https://www.runoob.com/wp-content/uploads/2015/10/35137047.jpg)
 
 
 
+**代码实现**：
+
+在第三点的clipDrawable上做一点点修改即可!
+
+**①定义一个rotateDrawable资源文件**:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<rotate xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@mipmap/ic_launcher"
+    android:fromDegrees="-180"
+    android:pivotX="50%"
+    android:pivotY="50%" />  
+```
+
+**②activity_main.xml中修改下src指向上述drawable即可,MainActivity只需要把ClipDrawable** **改成rotateDrawable即可!**
+
+```java
+public class MainActivity extends AppCompatActivity {
+
+    private ImageView img_show;
+    private RotateDrawable cd;
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.what == 0x123) {
+                if (cd.getLevel() >= 10000)
+                    Toast.makeText(MainActivity.this, "转完了~",
+                            Toast.LENGTH_LONG).show();
+                cd.setLevel(cd.getLevel() + 400);
+            }
+        }
+    };
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        img_show = (ImageView) findViewById(R.id.img_show);
+        // 核心实现代码
+        cd = (RotateDrawable) img_show.getDrawable();
+        final Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                handler.sendEmptyMessage(0x123);
+                if (cd.getLevel() >= 10000) {
+                    timer.cancel();
+                }
+            }
+        }, 0, 100);
+    }
+}
+```
+
+## AnimationDrawable
+
+> 本节最后一个Drawable，AnimationDrawable是用来实现Android中帧动画的,就是把一系列的 Drawable，按照一定得顺序一帧帧地播放；Android中动画比较丰富,有传统补间动画,平移, 缩放等等效果,但是这里我们仅仅介绍这个AnimationDrawable实现帧动画,关于alpha,scale, translate,rotate等,后续在动画章节再进行详细的介绍~
+>
+> 我们这里使用<**animation-list**>作为根节点
+
+**相关属性方法**:
+
+> **oneshot**:设置是否循环播放,false为循环播放!!! **duration**:帧间隔时间,通常我们会设置为300毫秒 我们获得AniamtionDrawable实例后，需要调用它的start()方法播放动画，另外要注意 在OnCreate()方法中调用的话,是没有任何效果的,因为View还没完成初始化,我们可以 用简单的handler来延迟播放动画!当然还有其他的方法,可见下述链接: [Android AnimationDrawable运行的几种方式](https://www.runoob.com/w3cnote/android-animationdrawable.html) 使用AnimationDrawable来实现帧动画真的是非常方便的~
+
+**使用示例**：
+
+**运行效果图**：
+
+![img](https://www.runoob.com/wp-content/uploads/2015/10/71886461.jpg)
+
+**代码实现**：
+
+①**先定义一个AnimationDrawable的xml资源文件**:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:oneshot="false">
+
+    <item
+        android:drawable="@mipmap/ic_pull_to_refresh_loading01"
+        android:duration="100" />
+
+    <item
+        android:drawable="@mipmap/ic_pull_to_refresh_loading02"
+        android:duration="100" />
+    <item
+        android:drawable="@mipmap/ic_pull_to_refresh_loading03"
+        android:duration="100" />
+    <item
+        android:drawable="@mipmap/ic_pull_to_refresh_loading04"
+        android:duration="100" />
+    <item
+        android:drawable="@mipmap/ic_pull_to_refresh_loading05"
+        android:duration="100" />
+    <item
+        android:drawable="@mipmap/ic_pull_to_refresh_loading06"
+        android:duration="100" />
+
+</animation-list> 
+```
+
+**②activity_main.xml设置下src,然后MainActivity中**:
+
+```java
+public class MainActivity extends AppCompatActivity {
+
+    private ImageView img_show;
+    private AnimationDrawable ad;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        img_show = (ImageView) findViewById(R.id.img_show);
+        // 核心实现代码
+        ad = (AnimationDrawable) img_show.getDrawable();
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                ad.start();
+            }
+        }, 300);
+    }
+}
+```
+
+嘿嘿，超简单有木有，以后在一些需要用到帧动画的地方，直接上**AnimationDrawable**， 当然，只适合于不需要进行控制的帧动画，比如上面这个就是超表下拉刷新时候的进度条素材 做成的一个简单帧动画！根据自己的需求自行拓展~
+
+## LayerDrawable
+
+层图形对象，包含一个Drawable数组，然后按照数组对应的顺序来绘制他们，索引 值最大的Drawable会被绘制在最上层！虽然这些Drawable会有交叉或者重叠的区域，但 他们位于不同的层，所以并不会相互影响，以<**layer-list**>作为根节点！
+
+**相关属性如下**：
+
+> - **drawable**:引用的位图资源,如果为空徐璈有一个Drawable类型的子节点
+> - **left**:层相对于容器的左边距
+> - **right**:层相对于容器的右边距
+> - **top**:层相对于容器的上边距
+> - **bottom**:层相对于容器的下边距
+> - **id**:层的id
+
+**使用示例**：
+
+**运行效果图**：
+
+![img](https://www.runoob.com/wp-content/uploads/2015/10/33659494.jpg)
 
 
 
+**代码实现**：
+
+非常简单，结合前面学习的shapeDrawable和ClipDrawable：
+
+**layerList_one.xml**
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@android:id/background">
+        <shape android:shape="rectangle">
+            <solid android:color="#C2C2C1" />
+            <corners android:radius="50dp" />
+        </shape>
+    </item>
+    <item android:id="@android:id/progress">
+        <clip>
+            <shape android:shape="rectangle">
+                <solid android:color="#BCDA73" />
+                <corners android:radius="50dp" />
+            </shape>
+        </clip>
+    </item>
+</layer-list> 
+```
+
+然后在布局文件中添加一个Seekbar，内容如下：
+
+```xml
+<SeekBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminateDrawable="@android:drawable/progress_indeterminate_horizontal"
+        android:indeterminateOnly="false"
+        android:maxHeight="10dp"
+        android:minHeight="5dp"
+        android:progressDrawable="@drawable/layerlist_one"
+        android:thumb="@drawable/shape_slider" />
+```
+
+卧槽，没了？对的，就是这么点东西~说了是层图形对象，我们还可以弄个**层叠图片**的效果：![img](https://www.runoob.com/wp-content/uploads/2015/10/80416467.jpg)
+
+**运行效果图**：
+
+**实现代码**：
+
+**层叠图片的layerlist_two.xml**:
 
 
 
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <bitmap
+            android:gravity="center"
+            android:src="@mipmap/ic_bg_ciwei" />
+    </item>
+    <item
+        android:left="25dp"
+        android:top="25dp">
+        <bitmap
+            android:gravity="center"
+            android:src="@mipmap/ic_bg_ciwei" />
+    </item>
+    <item
+        android:left="50dp"
+        android:top="50dp">
+        <bitmap
+            android:gravity="center"
+            android:src="@mipmap/ic_bg_ciwei" />
+    </item>
+</layer-list> 
+```
 
+然后在activity_main.xml里加个ImageView，内容如下：
 
+```xml
+<ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/layerlist_two"/>
+```
 
+## TransitionDrawable
 
+LayerDrawable的一个子类，TransitionDrawable只管理两层的Drawable！两层！两层！ 并且提供了透明度变化的动画，可以控制一层Drawable过度到另一层Drawable的动画效果。 根节点为<**transition**>，记住只有两个Item，多了也没用，属性和LayerDrawable差不多， 我们需要调用**startTransition**方法才能启动两层间的切换动画； 也可以调用**reverseTransition()**方法反过来播放：
 
+**使用示例**：
 
+**运行效果图**：
 
+![img](https://www.runoob.com/wp-content/uploads/2015/10/85899256.jpg)
 
+**实现代码**：
 
+在res/drawable创建一个TransitionDrawable的xml文件
 
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<transition xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item android:drawable="@mipmap/ic_bg_meizi1"/>
+    <item android:drawable="@mipmap/ic_bg_meizi2"/>
+</transition>
+```
 
+然后布局文件里加个ImageView，然后把src设置成上面的这个drawable 然后MainActivity.java内容如下：
 
+```java
+public class MainActivity extends AppCompatActivity {
+    private ImageView img_show;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        img_show = (ImageView) findViewById(R.id.img_show);
+        TransitionDrawable td = (TransitionDrawable) img_show.getDrawable();
+        td.startTransition(3000);
+        //你可以可以反过来播放，使用reverseTransition即可~
+        //td.reverseTransition(3000);
+    }
+}
+```
 
+另外，如果你想实现：多张图片循环的淡入淡出的效果 可参考：[Android Drawable Resource学习（七）、TransitionDrawable](http://blog.csdn.net/lonelyroamer/article/details/8243606)中的示例 很简单，核心原理就是：handler定时修改Transition中两个图片！
 
+## LevelListDrawable
 
+> 用来管理一组Drawable的,我们可以为里面的drawable设置不同的level， 当他们绘制的时候，会根据level属性值获取对应的drawable绘制到画布上，根节点 为:<**level-list**>他并没有可以设置的属性，我们能做的只是设置每个<**item**> 的属性！
 
+**item可供设置的属性如下**：
 
+> - **drawable**:引用的位图资源,如果为空徐璈有一个Drawable类型的子节点
+> - **minlevel:level**对应的最小值
+> - **maxlevel:level**对应的最大值
 
+**使用示例**：
 
+**运行效果图**：
 
+![img](https://www.runoob.com/wp-content/uploads/2015/10/65455566.jpg)
 
+**代码实现**：
 
+通过shapeDrawable画圆，一式五份，改下宽高即可：
 
+**shape_cir1.xml**：
 
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="#2C96ED"/>
+    <size android:height="20dp" android:width="20dp"/>
+</shape>
+```
 
+接着到LevelListDrawable，这里我们设置五层：
 
+**level_cir.xml**：
 
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<level-list xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item android:drawable="@drawable/shape_cir1" android:maxLevel="2000"/>
+    <item android:drawable="@drawable/shape_cir2" android:maxLevel="4000"/>
+    <item android:drawable="@drawable/shape_cir3" android:maxLevel="6000"/>
+    <item android:drawable="@drawable/shape_cir4" android:maxLevel="8000"/>
+    <item android:drawable="@drawable/shape_cir5" android:maxLevel="10000"/>
+</level-list> 
+```
 
+最后MainActivity写如下代码：
 
+```java
+public class MainActivity extends AppCompatActivity {
 
+    private ImageView img_show;
 
+    private LevelListDrawable ld;
+    private Handler handler = new Handler() {
+        public void handleMessage(Message msg) {
+            if (msg.what == 0x123) {
+                if (ld.getLevel() > 10000) ld.setLevel(0);
+                img_show.setImageLevel(ld.getLevel() + 2000);
+            }
+        }
+    };
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        img_show = (ImageView) findViewById(R.id.img_show);
+        ld = (LevelListDrawable) img_show.getDrawable();
+        img_show.setImageLevel(0);
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                handler.sendEmptyMessage(0x123);
+            }
+        }, 0, 100);
+    }
+}
+```
 
+## StateListDrawable
 
+好了终于迎来了最后一个drawable：StateListDrawable，这个名字看上去模式，其实我们 以前就用到了，还记得为按钮设置不同状态的drawable的<**selctor**>吗？没错，用到的 就是这个StateListDrawable！
 
+**可供设置的属性如下**：
 
+> - **drawable**:引用的Drawable位图,我们可以把他放到最前面,就表示组件的正常状态~
+> - **state_focused**:是否获得焦点
+> - **state_window_focused**:是否获得窗口焦点
+> - **state_enabled**:控件是否可用
+> - **state_checkable**:控件可否被勾选,eg:checkbox
+> - **state_checked**:控件是否被勾选
+> - **state_selected**:控件是否被选择,针对有滚轮的情况
+> - **state_pressed**:控件是否被按下
+> - **state_active**:控件是否处于活动状态,eg:slidingTab
+> - **state_single**:控件包含多个子控件时,确定是否只显示一个子控件
+> - **state_first**:控件包含多个子控件时,确定第一个子控件是否处于显示状态
+> - **state_middle**:控件包含多个子控件时,确定中间一个子控件是否处于显示状态
+> - **state_last**:控件包含多个子控件时,确定最后一个子控件是否处于显示状态
 
+**使用示例**：
 
+那就来写个简单的圆角按钮吧！
 
+**运行效果图**：
 
+![img](https://www.runoob.com/wp-content/uploads/2015/10/32015507.jpg)
 
+**代码实现**：
 
+那就先通过shapeDrawable来画两个圆角矩形，只是颜色不一样而已：
 
+**shape_btn_normal.xml**：
 
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#DD788A"/>
+    <corners android:radius="5dp"/>
+    <padding android:top="2dp" android:bottom="2dp"/>
+</shape>
+```
 
+接着我们来写个selctor：**selctor_btn.xml**：
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true" android:drawable="@drawable/shape_btn_pressed"/>
+    <item android:drawable="@drawable/shape_btn_normal"/>
+</selector>
+```
+
+然后按钮设置android:background="@drawable/selctor_btn"就可以了~ 你可以根据自己需求改成矩形或者椭圆，圆形等！
 
 
 
@@ -3116,6 +4234,8 @@ public class CaClothes extends AppCompatActivity implements View.OnTouchListener
 
 
 # ==动画==
+
+
 
 
 

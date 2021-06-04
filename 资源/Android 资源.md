@@ -6,3 +6,8 @@ https://www.52pojie.cn/thread-1354880-1-1.htm
 
 [凶残的程序员](https://blog.csdn.net/qian520ao)
 
+[自定义view书的博客](https://qijian.blog.csdn.net/)
+
+[自定义view系列](https://www.jianshu.com/nb/19704935)
+
+[             ![286](https://upload.jianshu.io/book/image/da5b1ff6-08a0-44f0-a34e-c901ee6bfeb8.png?imageMogr2/auto-orient/strip|imageView2/1/w/214/h/286) ](https://www.jianshu.com/nb/19704935)
