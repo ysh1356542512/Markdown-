@@ -155,3 +155,7 @@ git pull origin main --allow-unrelated-histories
 git config --global http.sslVerify false
 ```
 
+## 练习网站
+
+https://learngitbranching.js.org/?locale=zh_CN
+

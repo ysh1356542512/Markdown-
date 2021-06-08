@@ -623,11 +623,13 @@ public class MyTextView extends View {    private static final String TAG = MyTe
 
 
 
+# ==事件分发==
 
+1.如果销售链没有形成，零售商不能找到总代理直接要到事件的消费权。2.销售链形成后，再次来了事件，会直接沿着销售链走，不会再次去询问了。3.当销售链形成后，底层对上层有反响制约的权利。4.上层拥有两次选择的机会，1.刚收到事件2.全部都没有处理事件。
 
+![ScreenClip](../../%E5%9B%BE%E5%BA%93/%E8%87%AA%E5%AE%9A%E4%B9%89view%E5%9F%BA%E7%A1%80/ScreenClip.png)
 
-
-
+*/****** *这一句话 在自定义**view**里面引用布局是必须的 否则将会报错***/*LayoutInflater.*from*(context).inflate(R.layout.*search_layout*, this);
 
 # ==绘图基础==
 

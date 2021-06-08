@@ -1251,6 +1251,8 @@ JAVA反射机制是在运行状态中，对于任意一个类，都能够知道�
 
 ## 小点
 
+
+
 ```java
 //获取泛型类型    这样就可以获取java的类型  并且可以当做基本类型一样去强转
 val type = (this.javaClass
@@ -1259,6 +1261,25 @@ val list = gson.fromJson<RESPONSE>(result, type)
 ```
 
 ![Image](../../%E5%9B%BE%E5%BA%93/java%E4%B8%AD%E7%BA%A7/feefb1b1dd51f1eb92f389331557c823.png)
+
+```java
+/获取泛型类型    这样就可以获取java的类型  并且可以当做基本类型一样去强转
+val type = (this.javaClass
+.genericSuperclass as ParameterizedType).getActualTypeArguments()[0]
+val list = gson.fromJson<RESPONSE>(result, type)
+```
+
+
+
+![Image](../../%E5%9B%BE%E5%BA%93/java%E4%B8%AD%E7%BA%A7/Image.png)
+
+
+
+
+
+
+
+
 
 # JMM（内存模型）
 

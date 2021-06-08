@@ -1,4 +1,4 @@
-# ==属性动画进阶==
+# =属性动画进阶==
 
 ## ViewPropertyAnimator
 
@@ -3214,6 +3214,22 @@ public class MyGiftView extends RelativeLayout{
 
 # ==过渡动画==
 
+## **博客**
+
+![img](http://5b0988e595225.cdn.sohucs.com/images/20190619/6f0d0f60e0de4d7c88b4122aa59658cd.jpeg)
+
+
+
+
+
+
+
+
+
+由于笔记太烂了 还是放一篇博客在这里
+
+[【Transition】Android炫酷的Activity切换效果，共享元素](https://www.jianshu.com/p/a43daa1e3d6e)
+
 ## Transition
 
 ### 简介
@@ -3235,6 +3251,23 @@ Transition框架是安卓4以后引入的一个转场框架。可以在场景转
 ### 相关动画类型
 
 ![img](https://user-gold-cdn.xitu.io/2020/2/16/1704d376221c56ff?imageView2/0/w/1280/h/960/ignore-error/1)
+
+
+
+
+
+| 系统Transition       | 解释                                                         |
+| -------------------- | ------------------------------------------------------------ |
+| ChangeBounds         | 检测View的位置边界创建移动和缩放动画(关注布局边界的变化)     |
+| ChangeTransform      | 检测View的scale和rotation创建缩放和旋转动画(关注scale和ratation的变化) |
+| ChangeClipBounds     | 检测View的剪切区域的位置边界，和ChangeBounds类似。不过ChangeBounds针对的是view而ChangeClipBounds针对的是view的剪切区域setClipBound(Rect rect) 中的rect(关注的是setClipBounds(Rect rect)rect的变化) |
+| ChangeImageTransform | 检测ImageView的ScaleType，并创建相应动画(关注的是ImageView的scaleType) |
+| Fade                 | 根据View的visibility状态的的不同创建淡入淡动画,调整的是透明度(关注的是View的visibility的状态) |
+| Slide                | 根据View的visibility状态的的不同创建滑动动画(关注的是View的visibility的状态) |
+| Explode              | 根据View的visibility状态的的不同创建分解动画(关注的是View的visibility的状态) |
+| AutoTransition       | 默认动画，ChangeBounds、Fade动画的集合                       |
+
+​    
 
 ### 动画的创建方法
 
@@ -3303,13 +3336,228 @@ val transitionSet = TransitionSet()
 
 #### Activity的转场
 
-`A.exitTransition()`: 从A到B时A的退出动画 `B.enterTransition()`: 从A到B时B的进场动画 `B.returnTransition()`: 从B返回A时的退出动画 `A.reenterTransition()`: 从B返回A时的进场动画
+
+
+ **API 21之前Activity过渡动画使用**
+
+API21之前Activity过渡动画通过两种方式来实现:style主题里面统一设置、或者使用代码overridePendingTransition函数单独设置。(当然了代码设置的优先级要高于style主题里面统一设置)
+
+style文件主题里面统一定义，全局为所有Activity设置过渡动画效果。
+
+```xml
+<item name="android:windowAnimationStyle">@style/Animation.Activity.Customer</item>
+```
+
+```xml
+    <style name="Animation.Activity.Customer" parent="@android:style/Animation.Activity">
+        <!-- 进入一个新的Activity的时候，A->B B进入动画 -->
+        <item name="android:activityOpenEnterAnimation">@anim/right_in</item>
+        <!-- 进入一个新的Activity的时候，A->B A退出动画 -->
+        <item name="android:activityOpenExitAnimation">@anim/left_out</item>
+        <!-- 退出一个Activity的时候，B返回到A A进入动画 -->
+        <item name="android:activityCloseEnterAnimation">@anim/left_in</item>
+        <!-- 退出一个Activity的时候，B返回到A B退出动画 -->
+        <item name="android:activityCloseExitAnimation">@anim/right_out</item>
+    </style>
+```
+
+**API 21 之后Activity过渡动画使用**
+
+Activity过渡动画效果图
+
+![img](https://upload-images.jianshu.io/upload_images/9182331-a7fb149205977fff?imageMogr2/auto-orient/strip|imageView2/2/w/340)
+
+
+
+ But 现在你又可以获取一个新的技能了。在API 21之后google又推出了一种比之前效果更加赞的过渡动画。 通过ActivityOptions + Transition来实现Activity过渡动画。
+
+在讲使用ActivityOptions + Transition来实现Activity过渡动画之前先来了看下ActivityOptions里面几个函数代表啥意思。
+
+```cpp
+/**
+ * 和overridePendingTransition类似,设置跳转时候的进入动画和退出动画
+ */
+public static ActivityOptions makeCustomAnimation(Context context, int enterResId, int exitResId);
+
+/**
+ * 通过把要进入的Activity通过放大的效果过渡进去
+ * 举一个简单的例子来理解source=view,startX=view.getWidth(),startY=view.getHeight(),startWidth=0,startHeight=0
+ * 表明新的Activity从view的中心从无到有慢慢放大的过程
+ */
+public static ActivityOptions makeScaleUpAnimation(View source, int startX, int startY, int width, int height);
+
+/**
+ * 通过放大一个图片过渡到新的Activity
+ */
+public static ActivityOptions makeThumbnailScaleUpAnimation(View source, Bitmap thumbnail, int startX, int startY);
+
+/**
+ * 场景动画，体现在两个Activity中的某些view协同去完成过渡动画效果，等下在例子中能更好的看到效果
+ */
+public static ActivityOptions makeSceneTransitionAnimation(Activity activity, View sharedElement, String sharedElementName);
+
+/**
+ * 场景动画，同上是对多个View同时起作用
+ */
+public static ActivityOptions makeSceneTransitionAnimation(Activity activity, android.util.Pair<View, String>... sharedElements);
+```
+
+ 上面给出了四类方式的使用，个人觉得makeCustomAnimation、makeScaleUpAnimation、makeThumbnailScaleUpAnimation这三种产生的效果还是走的API 21之前的效果，而且这三种效果好像和Transition动画没啥太多的联系。我们用的最多的还是makeSceneTransitionAnimation()函数，makeSceneTransitionAnimation效果才是和Transition动画效果密切相关的。所以我们重点来看makeSceneTransitionAnimation的使用。
+
+​    Transitionz过渡动画的使用也是有前提的：
+
+- API 21以上。当然你也可以不使用ActivityOptions，而是使用兼容类ActivityOptionsCompat来替换ActivityOptions。(兼容类给到我们的作用是保证程序在低版本运行不会挂掉，但是不能保证低版本也能起到响应的效果的)
+- 必须允许Activity可以使用Transition，要么在style里面设置(<item name="android:windowContentTransitions">true</item>)，要么直接通过代码设置(getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);)。
+
+​    对于Transition Activity过渡动画的使用，我们简单的分为三个步骤：告诉系统以Transition的方式启动Activity、定义过渡动画、设置过渡动画。
+
+==以Transition的方式启动Activity==
+
+  启动Activity的方式和之前不一样了，要告诉Activity以Transition的方式启动。先要得到ActivityOptions，而且调用的startActivity()还和之前不一样了，是调用两个参数的startActivity(),第二个参数是ActivityOptions.toBundler。(当然为了兼容之前的版本你也可以使用兼容类ActivityOptionsCompat, ActivityCompat)。如下述代码所示。
+
+API 21 之后的代码
+
+```java
+ActivityOptions compat = ActivityOptions.makeSceneTransitionAnimation(mActivity);
+startActivity(new Intent(mContext, MakeSceneTransitionctivity.class), compat.toBundle());
+```
+
+使用ActivityOptionsCompat兼容API 21之前的代码
+
+```java
+ActivityOptionsCompat compat = ActivityOptionsCompat.makeSceneTransitionAnimation(mActivity);
+ActivityCompat.startActivity(mContext, new Intent(mContext, MakeSceneTransitionActivity.class), compat.toBundle());
+```
+
+
+
+
+
+
+
+告诉Activity以Transition的方式启动了，也定义好了过渡动画了。接下来就是去设置过渡动画了。Transition过渡动画的设置可以在style文件中统一设置也可以在代码中设置(代码中设置的优先级比style主题文件优先级高)。
+
+| 代码指定                           | style主题指定                   | 解释                                                     |
+| ---------------------------------- | ------------------------------- | -------------------------------------------------------- |
+| getWindow().setEnterTransition()   | android:windowEnterTransition   | A启动B，B中的View进入场景的transition(代码所在位置B)     |
+| getWindow().setExitTransition()    | android:windowExitTransition    | A启动B，A中的View退出场景的transition(代码所在位置A)     |
+| getWindow().setReturnTransition()  | android:windowReturnTransition  | B返回A，B中的View退出场景的transition(代码所在位置B)     |
+| getWindow().setReenterTransition() | android:windowReenterTransition | B返回A，A中的View重新进入场景的transition(代码所在位置A) |
+
+> ​    Activity过渡动画使用的时候有一个设置可以提高展示效果，可以通过在主题中设置windowAllowEnterTransitionOverlap、windowAllowReturnTransitionOverlap让动画过渡的更加自然。其中windowAllowEnterTransitionOverlap表示进入动画是否可以覆盖别的动画、windowAllowReturnTransitionOverlap表示返回动画是否可以覆盖别的动画。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#### 动画目标
+
+前面做转场动画时，默认情况过渡动画会对所有的子View进行遍历加载动画，如果时添加目标则不会进行遍历所有子View，或者可以排除特定的View。
+
+对于目标，一般有三种操作:
+
+    添加：默认会进行遍历所有的视图加载动画, 但是如果使用了添加就不会遍历所有, 只会让指定的视图进行动画
+    排除：如果使用排除方法, 依旧会进行遍历视图对象, 不过会排除你指定的视图
+    删除：删除目标是在动画已经遍历视图完成以后还想对目标集合进行变更, 就可以删除指定的视图
+**添加/排除/删除目标支持以下参数类型**：
+
+1. 视图对象（View）
+2. 过渡名（TransitionName）
+3. 字节码（Class）
+4. ID
+
+指定目标View，让目标View参与动画
+
+```java
+Transition addTarget (View target)
+
+Transition addTarget (String targetName)
+
+Transition addTarget (Class targetType)
+
+Transition addTarget (int targetId)
+```
+
+相应的对于删除或者排除，则分别是：`removeTarget()`与`excludeTraget()`
+
+使用示例：
+
+```java
+private void setupWindowAnimations() {
+        // inflate from xml
+        Fade fade = (Fade) TransitionInflater.from(this).inflateTransition(R.transition.activity_fade);
+        fade.excludeTarget(android.R.id.navigationBarBackground,true);
+        fade.excludeTarget(android.R.id.statusBarBackground,true);
+        Slide slide = (Slide) TransitionInflater.from(this).inflateTransition(R.transition.activity_slide);
+        slide.setSlideEdge(Gravity.LEFT);
+        slide.setDuration(2000);
+        slide.excludeTarget(android.R.id.navigationBarBackground, true);	// 	排除导航栏
+        slide.excludeTarget(android.R.id.statusBarBackground,true);	//排除状态栏
+        slide.removeTarget(mTextView);
+        getWindow().setEnterTransition(slide);
+        getWindow().setReturnTransition(slide);
+//        getWindow().setReenterTransition(fade);
+//        getWindow().setExitTransition(slide);
+    }
+```
+
+
+
+
+
+
+
+
+
+
+
+
 
 #### 进场退场的过渡动画
 
 1. `explore` : 将View移入场景中心或从中移出。
 2. `slide` : 将视图从场景的其中一个边缘移入或移出。可以利用`slideEdge=Gravity.Start`方式设置移入移出边缘。
 3. `fade` : 通过更改视图的不透明度，在场景中添加视图或从中移除视图。
+
+| Explode                                                      |                            Slide                             |                             Fade                             |
+| :----------------------------------------------------------- | :----------------------------------------------------------: | :----------------------------------------------------------: |
+| 从中心移入或移出                                             |                       从边缘移入或移出                       |                      调整透明度产生渐变                      |
+| ![img](https://upload-images.jianshu.io/upload_images/1689895-4c839936d9139327.gif?imageMogr2/auto-orient/strip\|imageView2/2/w/320) | ![img](https://upload-images.jianshu.io/upload_images/1689895-0bc9c94a12b1e000.gif?imageMogr2/auto-orient/strip\|imageView2/2/w/320) | ![img](https://upload-images.jianshu.io/upload_images/1689895-ff586e54872bcd4e.gif?imageMogr2/auto-orient/strip\|imageView2/2/w/320) |
+
+这三个类都继承于 Transition ，所有有一些属性都是共同的。
+ 常用属性如下：
+
+```cpp
+// 设置动画的时间。类型：long
+transition.setDuration();
+// 设置修饰动画，定义动画的变化率，具体设置往下翻就看到了
+transition.setInterpolator();
+// 设置动画开始时间，延迟n毫秒播放。类型：long
+transition.setStartDelay();
+// 设置动画的运行路径
+transition.setPathMotion();
+// 改变动画 出现/消失 的模式。Visibility.MODE_IN:进入；Visibility.MODE_OUT：退出。
+transition.setMode();
+
+// 设置动画的监听事件
+transition.addListener()
+```
+
+
+
+
+
+
 
 系统支持将任何扩展 Visibility 类的过渡作为进入或退出过渡。
 
@@ -3339,7 +3587,6 @@ window.let {
             it.enterTransition = Slide().apply {
                 duration = 200
                 slideEdge = Gravity.START
-
             }
             it.reenterTransition = Slide().apply {
                 duration = 200
@@ -3371,7 +3618,42 @@ btn2.setOnClickListener {
 
 ### 元素共享
 
+Shared  elements转换确定两个Activity之间共享的视图如何在这两个Activity之间转换。例如，如果两个Activity在不同的位置和大小中具有相同的图像，则通过Shared elements转换会在这两个Activity之间平滑地转换和缩放图像。
+
+<img src="http://5b0988e595225.cdn.sohucs.com/images/20190619/456e082f9c4a41d1b68098aa22aa1ffc.jpeg" alt="img" style="zoom:200%;" />
+
+changeBounds 改变目标布局中view的边界
+
+changeClipBounds 裁剪目标布局中view的边界
+
+changeTransform 实现旋转或者缩放动画
+
+changeImageTransform 实现目标布局中ImageView的旋转或者缩放动画
+
+
+
+
+
 元素共享转场是Meterial设计中个人比较喜欢的设计之一。 activity之间的转场总有顿挫感，但是利用元素共享转场可以让前一个画面中的元素可以在下一个画面上流畅的显示。
+
+你可能有发现前面讲的Activity过渡动画的实例中，ActivityOptions类里面makeSceneTransitionAnimation()函数后面的参数我们都没有传递进去，其实后面的参数是在使用共享元素的时候才会使用到的，接下来的实例这些个参数就会排上用场了。
+
+  当你想要从一个Activity A转换到Activity B，而且他们共享一个元素（比如是一个view），在这种场景下，最好的用户体验可能就是将共享的元素直接变换到最终的地方和大小，这会使用户专注于应用而且有一种连贯性的表达。
+
+​    共享元素的连接点是所有共享元素View的transition name。它可以在layout文件里面设置(android:transitionName)、也可以代码设置(View.setTransitionName(ImageConstants.IMAGE_SOURCE[mCurrentPosition]);)。通过transtion name来判断哪两个元素是共享关系。
+
+​    有了前面Activity过渡动的理解，共享元素动画在理解上就简单的多了。同Activity过渡动画一样，共享元素的动画也可以通过代码或者主题文件来设置(Fragment里面共享元素动画的设置可以类比Activity里面共享元素动画的设置)，如下所示。
+
+| 代码指定                                        | style主题指定                                | 解释                                                         |
+| ----------------------------------------------- | -------------------------------------------- | ------------------------------------------------------------ |
+| getWindow().setSharedElementEnterTransition()   | android:windowSharedElementEnterTransition   | A启动B，B中的View共享元素的transition(代码所在位置B)         |
+| getWindow().setSharedElementExitTransition()    | android:windowSharedElementExitTransition    | A启动B，A中的View共享元素transition(代码所在位置A)           |
+| getWindow().setSharedElementReturnTransition()  | android:windowSharedElementReturnTransition  | B返回A，B中的View共享元素的transition(代码所在位置B)         |
+| getWindow().setSharedElementReenterTransition() | android:windowSharedElementReenterTransition | B返回A，A中的View重新进入共享元素的transition(代码所在位置A) |
+
+
+
+
 
 #### 设置
 
@@ -3450,9 +3732,116 @@ startActivity(intent, transitionActivityOptions.toBundle())
 
 ![img](https://user-gold-cdn.xitu.io/2020/2/17/170518d3a3684dd8?imageslim)
 
+放置两张例子  后面有源码
+
+简单共享元素效果图
+
+![img](https://upload-images.jianshu.io/upload_images/9182331-31eda943a7cdf91e?imageMogr2/auto-orient/strip|imageView2/2/w/340)
+
+#### 更新共享元素动画
+
+效果图
+
+![img](https://upload-images.jianshu.io/upload_images/9182331-32ef891431bfb4b1?imageMogr2/auto-orient/strip|imageView2/2/w/340)
+
+
+
+有这种情况，比如我们第一个界面是一个列表(RecyclerView)每个item都是一个图片，点击进入另一个页面详情页面，详情页面呢有是ViewPager的形式。可以左右滑动。咱们有的时候就想，就算详情界面滑动到了其他照片，在返回到第一个页面的时候也想要有共享元素动画的效果。这个时候就得更新下共享元素的对应关系了。
+
+​    怎么更新呢，关键是看==SharedElementCallback==类的==onMapSharedElements()==函数，这个函数是用来装载共享元素的。比如有这么个情况，还是上面的例子A界面跳转到B界面。那么A界面在B返回的时候要更新下、B界面在返回之前要更新下。所以给A界面设置==setExitSharedElementCallback(SharedElementCallback)==;、给B界面设置==setEnterSharedElementCallback(SharedElementCallback)==。其他更多的细节可以参考下实例代码中的实现。
+
+> setExitSharedElementCallback(SharedElementCallback)的SharedElementCallback里面的
+>
+> onMapSharedElements()函数在Activity exit和reenter时都会触发
+>  setEnterSharedElementCallback(SharedElementCallback)的SharedElementCallback里面的onMapSharedElements()函数在Activity enter和return时都会触发。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Scene转换
 
 除了Activity之间的转换还有一个布局内的scene转换。
+
+场景过渡动画是指以动画的形式实现View两个场景的切换(从一个场景切换到另一个场景)。而且在切换过程中通过Transition来设置不同的过渡动画效果。
+
+场景过渡动画中有两个特别关键概念：（场景），Transition（过渡）。
+
+  
+
+- ==Scene==：Scene代表一个场景。Scene保存了一个视图层级结构，包括它所有的views以及views的状态，通常由getSceneForLayout (ViewGroup sceneRoot,int layoutId,Context context)获取Scene实例。Transition框架可以实现在starting scene和ending scene之间执行动画。而且大多数情况下，我们不需要创建starting scene，因为starting scene通常由当前UI状态决定，我们只需要创建ending scene。
+- ==Transition==：Transiton则是用来设置过渡动画效果用的。而且系统给提供了一些非常使用的Transtion动画效果，如下表所示:
+
+| 系统Transition       | 解释                                                         |
+| -------------------- | ------------------------------------------------------------ |
+| ChangeBounds         | 检测View的位置边界创建移动和缩放动画(关注布局边界的变化)     |
+| ChangeTransform      | 检测View的scale和rotation创建缩放和旋转动画(关注scale和ratation的变化) |
+| ChangeClipBounds     | 检测View的剪切区域的位置边界，和ChangeBounds类似。不过ChangeBounds针对的是view而ChangeClipBounds针对的是view的剪切区域setClipBound(Rect rect) 中的rect(关注的是setClipBounds(Rect rect)rect的变化) |
+| ChangeImageTransform | 检测ImageView的ScaleType，并创建相应动画(关注的是ImageView的scaleType) |
+| Fade                 | 根据View的visibility状态的的不同创建淡入淡动画,调整的是透明度(关注的是View的visibility的状态) |
+| Slide                | 根据View的visibility状态的的不同创建滑动动画(关注的是View的visibility的状态) |
+| Explode              | 根据View的visibility状态的的不同创建分解动画(关注的是View的visibility的状态) |
+| AutoTransition       | 默认动画，ChangeBounds、Fade动画的集合                       |
+
+
+
+
+
+
+
+
+
+
+
+​    要想实现一个场景过渡动画，==至少需要一个transition实例和一个ending scene实例==。并通过TransitionManager执行过渡动画。TransitionManager执行动画有两种方式：
+
+**TransitionManager.go()**
+
+**beginDelayedTransition()**。
+
+下面简单来介绍下这两种开启场景动画的方式。
+
+#### TransitionManager.go()
+
+用说TransitionManager.go()实现场景动画之前，先上效果图
+
+![img](https://upload-images.jianshu.io/upload_images/9182331-68300976457429e9?imageMogr2/auto-orient/strip|imageView2/2/w/340)
+
+
+
+ TransitionManager.go()需要两个参数:第一个参数代表要过渡到的场景(end scene)、第二个参数过渡动画(transition 实例)。
+
+TransitionManager.go()启动动画的时候，场景一般通过布局文件给出。场景实例的获取则通过Scene.getSceneForLayout()来获取，需要三个参数：
+
+第一个参数代表场景所在的ViewGroup、
+
+第二个参数代表场景布局文件
+
+第三个参数布局文件转换View所需要的Content。
+
+> TransitionManager.go()的场景是通过布局文件指定。
+
+#### beginDelayedTransition
+
+用beginDelayedTransition()实现场景动画的效果图
+
+![img](https://upload-images.jianshu.io/upload_images/9182331-f3c1f3f66bd4ac0c?imageMogr2/auto-orient/strip|imageView2/2/w/340)
+
+ 通过TransitionManager.beginDelayedTransition()也可以开启场景动画。在执行TransitionManager.beginDelayedTransition()之后，系统会保存一个当前视图树状态的场景，之后当我们改变了View的属性之后(比如重新设置了View位置、缩放、clipe等等)。在下一次绘制时，系统会自动对比之前保存的视图树，然后执行相应动画。
 
 ####  创建Scene
 
@@ -3472,7 +3861,7 @@ scene2 = Scene.getSceneForLayout(sceneRoot,R.layout.scene_layout2,this)
 
 ```
 
-注意的是需要创建前后两个Scene的控件的ID相同。
+注意的是需要创建前后==两个Scene的控件的ID==相同。
 
 #### 切换Scene
 
@@ -3533,17 +3922,611 @@ Android` 版本在 `4.0(API Level 14)` 到 `4.4.2(API Level 19)` 使用 `Android
 
 #### 资源
 
-github: [github.com/HyejeanMOON…](https://github.com/HyejeanMOON/TransitionDemo)
+https://github.com/ZXM250250/Animation
 
-## ActivityOptions
+Transitiondemo 模块
 
+## ==ActivityOptions==
 
+### 序言
 
+对于Android 5.0 之前，Android的过渡动画一般情况下使用：
 
+```java
+overridePendingTransition(enterAnim, exitAnim);
+```
 
-## 自定义Transition
+android 5.0及以上，google提供了新的转场动画方式，及这里要介绍使用的ActivityOptions，并且提供了兼容包ActivityOptionsCompat。根据当前android版本的发展情况，本文就主要讲ActivityOptions，其兼容包使用方法一样。
+
+ActivityOptions是一个静态类，提供了如下方法：
+
+```java
+makeCustomAnimation(Context context, int enterResId, int exitResId)
+makeScaleUpAnimation(View source, int startX, int startY, int width, int height)
+makeThumbnailScaleUpAnimation(View source, Bitmap thumbnail, int startX, int startY)
+makeSceneTransitionAnimation(Activity activity)
+makeSceneTransitionAnimation(Activity activity, View sharedElement, String sharedElementName)
+makeSceneTransitionAnimation(Activity activity, Pair<View, String>... sharedElements)
+。。。。。。
+```
+
+`ActivityOptions`的主要方法如上，这也是最主要的几种过渡方式，接下来将一一介绍各个方法的使用方式。
+
+### makeCustomAnimation
+
+如果定义转场效果等，对于这方面如果不清楚的话，可以查看[Android动画——Activity转场动画|过渡动画一点薄见(一)（（Transition Animation 系列））](https://blog.csdn.net/weixin_43499030/article/details/90413758)的前半部分
+
+```java
+ActivityOptions compat = ActivityOptions.makeCustomAnimation(this, R.anim.anim_activity_in, R.anim.anim_activity_out);
+                startActivity(new Intent(MainActivity.this, SecondActivity.class), compat.toBundle());
+```
+
+makeCustomAnimation方法需要3个参数：
+
+    第一个参数：Context类型，也就是Activity。
+    第二个参数：int类型，新Activity显示动画。
+    第三个参数：int类型，当前Activity的退出动画。
+
+这个方法与android 5.0之前的==overridePendingTransition==类似，故使用较少。
+备注：
+
+```java
+启动activity的方式是使用ActivityCompat.startActivity
+如果调用finish()退出Activity，则需要调用finishAfterTransition()进行退出动画
+```
+### makeScaleUpAnimation
+
+这个方法的**转场效果**时：
+
+> **在新Activity会一某个点为中心，从某个大小开始逐渐放大到最大**。
+>
+> 使用方法示例：
+>
+> ```java
+> ActivityOptions compat = ActivityOptions.makeScaleUpAnimation(mImage, mImage.getWidth(), mImage.getHeight(),0,0);
+> startActivity(new Intent(MainActivity.this, SecondActivity.class), compat.toBundle());
+> ```
+
+这个方法有五个参数：
+
+    第一个参数：View类型，从那个View的坐标开始放大
+    第二个参数：int类型，指定相对于View的X坐标为放大中心的X坐标
+    第三个参数：int类型，指定相对于View的Y坐标为放大中心的Y坐标
+    第四个坐标：int类型，指定放大前新Activity是多宽
+    第五个坐标：int类型，指定放大前新Activity是多高
+### makeThumbnailScaleUpAnimation
+
+该方法与上面一个方法类似，转场效果是：
+
+> 放大一个图片，最后过渡到一个新的Activity
+
+**使用方法**：
+
+```java
+ActivityOptions compat = ActivityOptions.makeThumbnailScaleUpAnimation(mTextView,BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher),0,0);
+startActivity(new Intent(MainActivity.this, SecondActivity.class), compat.toBundle());
+```
+
+该方法需有4个参数：
+
+- 第一个参数：View类型，要放大的图片从哪个View的左上角的坐标作为中心点放大。
+- 第二个参数：Bitmap类型，指定要放大的图片。
+- 第三个参数：放大前图片的初始宽度
+- 第四个参数：放大前图片的初始高度
+
+### makeSceneTransitionAnimation
+
+```java
+Intent intent = new Intent(MainActivity.this, SecondActivity.class);
+                startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(MainActivity.this).toBundle())
+```
+
+这个方法没什么可说的，就是简单的Activity转场
+
+### ==makeSceneTransitionAnimation==
+
+第二个这个方法是需要关注的重点，主要用于共享动画，关于共享动画的内容，可以查看[Android动画——Activity转场动画|过渡动画一点薄见(一)（（Transition Animation 系列））](https://blog.csdn.net/weixin_43499030/article/details/90413758)的共享动画部分
+
+转场效果：
+
+两个Activity的两个View协同完成转场，也就是原==Activity的View过度到新Activity的View==，原新两个Activity的View的`transitionName`相同。
+
+**使用方法**：
+
+```java
+Intent intent1 = new Intent(MainActivity.this, SharedElementActivity.class);
+startActivity(intent1, ActivityOptions.makeSceneTransitionAnimation(MainActivity.this,mImage,"image").toBundle())
+```
+
+activity_main.xml和activity_shared_element.xml的布局文件中都有一个ImageView，他们的android:transitionName属性值是一样的。
+
+这个方法有三个参数：
+
+    第一个参数：Context类型，指定Activity
+    第二个参数：View类型，指定从哪里过渡
+    第三个参数：String类型，过渡View的标志，即android:transitionName的属性值
+### ==makeSceneTransitionAnimation==
+
+转场效果：
+
+> 前面一个方法是单个View协作转场，这个方法可以实现多个view协作转场
+
+使用方法：
+
+```java
+Intent intent = new Intent(MainActivity.this, SharedElementActivity.class);
+Pair<View, String> p1 = Pair.create((View)textView1, "profile");
+Pair<View, String> p2 = Pair.create((View)textView, "test");
+startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(MainActivity.this,p1,p2).toBundle());
+```
+
+首先通过`Pair.Create`静态方法创建两个Pair对象，这里有两个泛型，分别指定为View和String，Create方法接收，第一个参数是参与动画的Veiw，第二个是该View的transitionName，与前面的单一协作转场类似。
+
+## ==自定义Transition==
 
 ### 原理
 
 在开始自定义之前, 我们首先来简单的了解一下Transition转场动画的原理, 大家在看到你所不知道的Activity转场动画——ActivityOptions这篇文章时, 对Android提供的这种新的转场动画都震撼到了, 但是肯定有很多人对它的原理不是很请求, 尤其是Scene场景动画, 一个ImageView怎么就变着变着跳转到其他的Activity了呢? 其实它的原理很简单,Transition动画其实就是拿着第一页某个view的信息去第二页的某个view上做的动画, 这样我们在视觉上就会产生一个渐变的错觉~
 
+### 玩玩Transition
+
+在稍微了解了一下原理之后, 我们就来玩玩`Transition`了, 如何自定义一个`Transition`呢? 跟自定义view我们需要继承View或者ViewGroup一样, 这里我们需要继承`Transition`类.
+
+```java
+public class MyTransition extends Transition {}
+```
+
+有两个抽象方法必须要要重写,
+
+public class MyTransition extends Transition {
+
+```java
+@Override
+public void captureStartValues(TransitionValues transitionValues) {
+
+}
+
+@Override
+public void captureEndValues(TransitionValues transitionValues) {
+
+}
+```
+除了这两个必须要重写的方法, 我们还要重写一个`createAnimator`方法来自定义动画, 于是, 我们要自定义一个`Transition`, 一个类的结构肯定是肯定是这样的.
+
+```java
+public class MyTransition extends Transition {
+
+    @Override
+    public void captureStartValues(TransitionValues transitionValues) {
+
+    }
+
+    @Override
+    public void captureEndValues(TransitionValues transitionValues) {
+
+    }
+
+    @Override
+    public Animator createAnimator(ViewGroup sceneRoot, TransitionValues startValues, final TransitionValues endValues) {
+    }
+}
+```
+
+ok, 下面我们来详细说一下这三个方法都是用来干嘛的.
+首先==captureStartValues==, 从字面上来看是用来收集开始信息的, 什么开始信息? 当然是动画的开始信息了. 那同样的==captureEndValues==是用来收集动画结束的信息的. 收集完了信息,就要通过createAnimator来创建个Animator供系统调用了.
+
+再来看看TransitionValues这个陌生的类, 这个类其实很简单, 只有==两个成员变量view和values==, view指的是我们要从哪个view上收集信息, values是用来存放我们收集到的信息的. 比如: 在captureStartValues里, transitionValues.view指的就是我们在开始动画的界面上的那个view, 在captureEndValues指的就是在目标界面上的那个view.
+
+好了, 上面几个方法的作用介绍完毕后, 我们马上就来完成一个进入消息内容的动画效果, 还是老规矩, 在开始代码之前, 我们先来看看效果.
+
+![img](https://img-blog.csdn.net/20161121000942985)
+
+仔细观察效果, 我们可以找到两处动画.
+
+> 1. 单行内容从它在列表中的位置移动到界面的最上面.
+> 2. 消息的内容由单行逐渐展开.
+> 3. 这两个动画是顺序执行的
+
+通过上面的分析, 我们大致可以得出, 下面, 我们需要收集的信息有**view在界面的位置**和**view的高度信息**, 所以我们先来定义一下需要收集的信息
+
+```java
+public class MyTransition extends Transition {
+
+    private static final String TOP = "top";
+    private static final String HEIGHT = "height";
+    // ...
+}
+```
+
+然后我们开始收集动画开始需要的信息
+
+```java
+public class MyTransition extends Transition {
+
+    private static final String TOP = "top";
+    private static final String HEIGHT = "height";
+
+    @Override
+    public void captureStartValues(TransitionValues transitionValues) {
+        View view = transitionValues.view;
+        Rect rect = new Rect();
+        view.getHitRect(rect);
+
+        transitionValues.values.put(TOP, rect.top);
+        transitionValues.values.put(HEIGHT, view.getHeight());
+
+        Log.d("qibin", "start:" + rect.top + ";" + view.getHeight());
+    }
+}
+```
+
+首先, 我们通过==transitionValues.view==拿到我们要收集信息的==目标view==, 然后我们可以通过getHitRect可以拿到它在ListView中的上下左右信息, 最后我们通过==transitionValues.values.put(TOP, rect.top)==来保存一下他距离父布局上面的距离, 当然我们还需要通过==transitionValues.values.put(HEIGHT, view.getHeight())==来保存动画初始的高度.
+
+收集完动画开始的信息, 我们再来收集动画结束的信息, 依葫芦画瓢, 很快就能写出下面的代码.
+
+```java
+public class MyTransition extends Transition {
+
+    private static final String TOP = "top";
+    private static final String HEIGHT = "height";
+
+    @Override
+    public void captureEndValues(TransitionValues transitionValues) {
+        transitionValues.values.put(TOP, 0);
+        transitionValues.values.put(HEIGHT, transitionValues.view.getHeight());
+
+        Log.d("qibin", "end:" + 0 + ";" + transitionValues.view.getHeight());
+    }
+}
+```
+
+这里的代码和上面并无差别, 动画结束后, view距离上面的距离应该是0, 不过这里需要注意的是==captureStartValues==方法里的transitionValues.view是我们页面跳转开始那个界面上的view, 而==captureEndValues==方法里的transitionValues.view是我们跳转目标上的view, 所以这两个方法里获取到的view的高度肯定是不一样的.
+
+好了, 在完成信息收集之后, 我们就来写动画效果了,
+
+```java
+public class MyTransition extends Transition {
+  @Override
+  public Animator createAnimator(ViewGroup sceneRoot, TransitionValues startValues, final TransitionValues endValues) {
+      if (startValues == null || endValues == null) { return null;}
+
+      final View endView = endValues.view;
+
+      final int startTop = (int) startValues.values.get(TOP);
+      final int startHeight = (int) startValues.values.get(HEIGHT);
+      final int endTop = (int) endValues.values.get(TOP);
+      final int endHeight = (int) endValues.values.get(HEIGHT);
+
+      ViewCompat.setTranslationY(endView, startTop);
+      endView.getLayoutParams().height = startHeight;
+      endView.requestLayout();
+
+      ValueAnimator positionAnimator = ValueAnimator.ofInt(startTop, endTop);
+      
+      if (mPositionDuration > 0) {
+          
+          positionAnimator.setDuration(mPositionDuration);
+          
+      }
+      
+      positionAnimator.setInterpolator(mPositionInterpolator);
+
+      positionAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+          @Override
+          public void onAnimationUpdate(ValueAnimator valueAnimator) {
+              int current = (int) valueAnimator.getAnimatedValue();
+              ViewCompat.setTranslationY(endView, current);
+          }
+      });
+
+      ValueAnimator sizeAnimator = ValueAnimator.ofInt(startHeight, endHeight);
+      if (mSizeDuration > 0) { 
+          sizeAnimator.setDuration(mSizeDuration);
+      }
+      sizeAnimator.setInterpolator(mSizeInterpolator);
+
+      sizeAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+          @Override
+          public void onAnimationUpdate(ValueAnimator valueAnimator) {
+              int current = (int) valueAnimator.getAnimatedValue();
+              endView.getLayoutParams().height = current;
+              endView.requestLayout();
+          }
+      });
+
+      AnimatorSet set = new AnimatorSet();
+      set.play(sizeAnimator).after(positionAnimator);
+
+      return set;
+  }
+}
+```
+
+在说原理的时候, 我们提到过, 这一系列的动画其实在我们跳转后的界面上完成的, 所以这里的动画我们也是在目标view上完成. 上面两个方法中收集到的信息, 我们需要在这里用到, 所以我们通过以下代码来获取收集到的信息.
+
+```java
+final int startTop = (int) startValues.values.get(TOP);
+final int startHeight = (int) startValues.values.get(HEIGHT);
+final int endTop = (int) endValues.values.get(TOP);
+final int endHeight = (int) endValues.values.get(HEIGHT);
+```
+
+`startValues`和`endValues`都是`createAnimator`的参数. 
+ 接着几行莫名奇妙的代码
+
+```java
+ViewCompat.setTranslationY(endView, startTop);
+endView.getLayoutParams().height = startHeight;
+endView.requestLayout();
+```
+
+是因为我们的动画顺序是==先移动, 后展开,== 首先把view的高度设置为前一个界面上view的高度是为了防止在移动的过程中view的高度是他自身的高度的.
+接着我们创建了两个动画, 这两个动画很好理解, 一个位移的,一个是展开的, 不过这里我们给了动画一个时长和插值器, 这两个信息是公开给调用者去设置的.
+最后我们创建一个AnimatorSet, 在这个动画集合中, 我们先来完成sizeAnimator然后开始positionAnimator, 最后返回该动画集合. 自定义Transition完毕.
+
+### 使用
+
+上面我们完成了`Transition`的自定义, 这里我们就来用一下它, 首先我们要在应用的主题中指定可以使用场景过度动画.
+
+```xml
+<item name="android:windowContentTransitions">true</item>
+```
+
+看过[你所不知道的Activity转场动画——ActivityOptions](http://blog.csdn.net/qibin0506/article/details/48129139)这篇文章的朋友都应该清楚, 我们还需要给我们两个activity中的view一个`transitionName`, 这里就不贴代码了, 然后我们就来看看如何做跳转.
+
+```java
+public class MainActivity extends AppCompatActivity {
+
+    private ListView mListView;
+    private Adapter mAdapter;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        mListView = (ListView) findViewById(R.id.list);
+        mAdapter = new Adapter();
+        mListView.setAdapter(new Adapter());
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                startActivity(view, mAdapter.getItem(position));
+            }
+        });
+    }
+       public void startActivity(View view, String content) {
+           Intent intent = new Intent(this, MessageActivity.class);
+           intent.putExtra("msg", content);
+
+           ActivityOptionsCompat compat = ActivityOptionsCompat
+                   .makeSceneTransitionAnimation(this, view, view.getTransitionName());
+           ActivityCompat.startActivity(this, intent, compat.toBundle());
+       }
+}
+```
+
+跳转的代码大家都可以在[你所不知道的Activity转场动画——ActivityOptions](http://blog.csdn.net/qibin0506/article/details/48129139)这篇文章中找到, 这里就不解释了, 我们主要还是来看看在目标activity中怎么应用动画.
+
+```java
+public class MessageActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.message_layout);
+        setTitle("Content");
+
+        TextView msgTextView = (TextView) findViewById(R.id.msg);
+        msgTextView.setText(getIntent().getStringExtra("msg"));
+
+        executeTransition();
+    }
+
+    public void executeTransition() {
+        MyTransition transition = new MyTransition();
+        transition.setPositionDuration(300);
+        transition.setSizeDuration(300);
+        transition.setPositionInterpolator(new FastOutLinearInInterpolator());
+        transition.setSizeInterpolator(new FastOutSlowInInterpolator());
+        transition.addTarget("message");
+
+        getWindow().setSharedElementEnterTransition(transition);
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
+    }
+}
+```
+
+来看`executeTransition`方法, 在这个方法中, 首页我们构建了一个我们自定义的`transition`, 然后各种配置, 解析来的一行代码,
+
+```java
+transition.addTarget("message");
+```
+
+这个`message`就是我们前面提到的`transitionName`, 最后我们通过
+
+```java
+getWindow().setSharedElementEnterTransition(transition);
+```
+
+来设置进入的动画. 
+ ok, 现在我们来看看效果
+
+![img](https://img-blog.csdn.net/20161121001017879)
+
+### 闪烁问题
+
+看到效果后, 细心的朋友可能发现, 在动画执行的过程中我们的NavigationBar会产生一个闪烁的效果, 这个效果不是我们想要的,出现这个问题的原因是共享元素动画是在整个窗口的view上执行的, 在这里找到了解决方案. 他的解决办法是: 首先将NavigationBar也作为动画的一部分, 然后在目标activity中延迟动画的执行. google给我们提供了两个方法来用, postponeEnterTransition()和startPostponedEnterTransition()方法来延迟动画的执行.
+
+所以, 现在我们的跳转代码应该是这样的.
+
+```java
+public void startActivity(View view, String content) {
+    View statusBar = findViewById(android.R.id.statusBarBackground);
+    View navigationBar = findViewById(android.R.id.navigationBarBackground);
+
+    List<Pair<View, String>> pairs = new ArrayList<>();
+    pairs.add(Pair.create(statusBar, Window.STATUS_BAR_BACKGROUND_TRANSITION_NAME));
+    pairs.add(Pair.create(navigationBar, Window.NAVIGATION_BAR_BACKGROUND_TRANSITION_NAME));
+    pairs.add(Pair.create(view, view.getTransitionName()));
+
+    Intent intent = new Intent(this, MessageActivity.class);
+    intent.putExtra("msg", content);
+
+    ActivityOptionsCompat compat = ActivityOptionsCompat
+            .makeSceneTransitionAnimation(this, pairs.toArray(new Pair[pairs.size()]));
+    ActivityCompat.startActivity(this, intent, compat.toBundle());
+}
+```
+
+在目标activity中执行的动画的代码也应该是这样的.
+
+```java
+public void executeTransition() {
+    postponeEnterTransition();
+
+    final View decorView = getWindow().getDecorView();
+    getWindow().getDecorView().getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+        @Override
+        public boolean onPreDraw() {
+            decorView.getViewTreeObserver().removeOnPreDrawListener(this);
+            supportStartPostponedEnterTransition();
+            return true;
+        }
+    });
+
+    MyTransition transition = new MyTransition();
+    transition.setPositionDuration(300);
+    transition.setSizeDuration(300);
+    transition.setPositionInterpolator(new FastOutLinearInInterpolator());
+    transition.setSizeInterpolator(new FastOutSlowInInterpolator());
+    transition.addTarget("message");
+
+    getWindow().setSharedElementEnterTransition(transition);
+}
+```
+
+### 资源
+
+https://github.com/ZXM250250/Animation
+
+在app模块下边
+
+# ==触摸反馈动画==
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# ==揭露动画==
+
+
+
+[揭露动画](https://blog.csdn.net/c10WTiybQ1Ye3/article/details/103471044?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522162306579816780366536717%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=162306579816780366536717&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduend~default-1-103471044.first_rank_v2_pc_rank_v29&utm_term=%E6%8F%AD%E9%9C%B2%E5%8A%A8%E7%94%BB&spm=1018.2226.3001.4187)
+
+
+
+![img](https://upload-images.jianshu.io/upload_images/1931245-ffb02f5988578122.gif?imageMogr2/auto-orient/strip|imageView2/2/w/200)
+
+AndroidPlatform 的 android.view 包下有个 ViewAnimationUtils 类，这是使用系统所提供揭露动画的唯一入口，其对外暴露的唯一接口如下：
+
+| Public methods   |                                                              |
+| ---------------- | ------------------------------------------------------------ |
+| static Animator! | createCircularReveal(view: View!, centerX: Int, centerY: Int, startRadius: Float, endRadius:  Float)Returns an Animator which can animate a clipping circle. |
+
+通过其静态的 createCircularReveal 方法来构造一个动画(Animator)对象，具体其实是个 RevealAnimator 类对象，进而可以实现一种炫酷(到底炫不炫酷就很主观了)的动画效果！
+
+```java
+createCircularReveal(View view, int centerX, int centerY, float startRadius, float endRadius
+```
+
+第一个参数是个 View，揭露动画的应用对象必须是一个 View，这点不难理解。
+
+第二个参数是圆形揭露效果的圆心 X 轴坐标，同理第三个参数是 Y 轴坐标。
+
+第三个参数是圆形揭露效果的开始半径，同理第三个参数是圆形揭露效果的终止半径，开始半径传 0，终止半径传 View  的宽度或高度就是个典型的从无到有的揭露(显示)过程，反之，开始半径传 View 的宽度或高度，终止半径传 0  就是个从有到无的反揭露(隐藏)过程。
+
+拿到此方法返回的 Animator 对象我们就可以随时控制 View 进行揭露动画了。
+
+## view
+
+
+
+
+
+
+
+
+
+## app
+
+
+
+## activity
+
+首先我们会遇到两个问题：
+
+1. 揭露动画用于 Activity 切换时，我们该把揭露动画应用于哪个 View(揭露动画的应用对象必须是一个 View)？
+2. 何时开始执行揭露动画？
+
+根据我们得 Demo，一一作答。
+
+揭露动画用于 Activity 切换时，最合适的对象肯定是此 Activity 相关 Window 的根视图，真正的根视图，没错正是此 Activity 的 Window 的 DecorView。
+
+至于揭露动画的开始时机，太早或太晚都不好。首先不能太早，如果当前 View 还未 Attach 到 Window 上就对其应用揭露动画会抛出异常，其次不能太晚，不然会严重影响动画的视觉效果。
+
+经作者实践，这个最好的揭露动画开始时机在视图的可见性刚变为对用户可见时最佳！我们通过为 View 的 ViewTreeObserver 设置一个 OnGlobalLayoutListener 回调可完美监听到这个最佳时机~
+
+我把相关实现代码全都放在了 Demo 的 BaseActivity 类里，用例 Activity 只要继承 BaseActivity  即可在打开时应用揭露动画效果。这里注意为了动画的连贯性我们需要把 Activity 揭露动画开始的圆心坐标从它的上个 Activity 里通过  Intent 传递过来，这点并不难实现。关键代码如下：
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# ==状态动画==
+
+
+
+
+
+
+
+# ==事件分发==
+
+1.如果销售链没有形成，零售商不能找到总代理直接要到事件的消费权。2.销售链形成后，再次来了事件，会直接沿着销售链走，不会再次去询问了。3.当销售链形成后，底层对上层有反响制约的权利。4.上层拥有两次选择的机会，1.刚收到事件2.全部都没有处理事件。
