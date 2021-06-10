@@ -1,5 +1,7 @@
 # ==分类==
 
+![ScreenClip](../../%E5%9B%BE%E5%BA%93/%E8%87%AA%E5%AE%9A%E4%B9%89view%E5%9F%BA%E7%A1%80/ScreenClip-1623318813131.png)
+
 自定义View的实现方式有以下几种
 
 | 类型              | 定义                                                         |

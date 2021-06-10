@@ -4527,6 +4527,40 @@ createCircularReveal(View view, int centerX, int centerY, float startRadius, flo
 
 
 
-# ==事件分发==
+# ==事件分发总结==
 
-1.如果销售链没有形成，零售商不能找到总代理直接要到事件的消费权。2.销售链形成后，再次来了事件，会直接沿着销售链走，不会再次去询问了。3.当销售链形成后，底层对上层有反响制约的权利。4.上层拥有两次选择的机会，1.刚收到事件2.全部都没有处理事件。
+**总结一**
+
+1.如果销售链没有形成，零售商不能找到总代理直接要到事件的消费权。
+
+2.销售链形成后，再次来了事件，会直接沿着销售链走，不会再次去询问了。
+
+3.当销售链形成后，底层对上层有反响制约的权利。
+
+4.上层拥有两次选择的机会，1.刚收到事件2.全部都没有处理事件。
+
+**总结二**
+
+1. 正常情况下，一个事件序列只能被一个view拦截并消耗
+
+2. ​    某个view一旦决定拦截处理事件，那么这个事件序列都将由它的onTouchEvent处理，并且
+
+   它的onInterceptTouchEvent不会再调用
+
+3.  某个view一旦开始处理事件，如果它不消耗DOWN事件（onTouchEvent返回false），那么同一事件序列中其他
+
+事件都不会再交给它处理，并且重新由它的父元素处理（父元素onTouchEvent被调用）
+
+4. 事件的分发过程是由外向内的，即事件总是先传递给父元素，然后再由父元素分发给子view，通过requestDisalowInterceptTouchEvent方法可以再子View中干预父元素的事件分发过程，但DOWN事件除外
+
+5. ViewGroup默认不拦截任何事件，即onInterceptTouchEvent默认返回fasle。view没有onInterceptTouchEvent方法调用一旦有点击事件传递给它，那么它的onToucheEvent就会被调用
+
+6. Viw的onTouchEvent默认会消耗事件，除非它是不可点击的（clickable和longClickabke同时为false）。view的longClickable默认都为false，clickable要分情况，不如button的clickable默认为true，TextView的clickable默认为false。
+
+7. View的enable属性不影响onTouchenEvent的默认返回值。哪怕一个view是disable状态的，只要它的clickable或者longClickabel有一个为true，那么它的onTouchEvent就会返回true。
+
+8. onClick会响应的前提是当前View是可点击的，并且收到了DOWN和UP的事件，并且受长按事件的影响，当长按事件返回true时，onClick不会响应。
+
+9. onLongClick在DOWN里判断是否进行响应，要想执行长按事件该View必须是longClickable的并且设置了OnLongClickListener。
+
+   

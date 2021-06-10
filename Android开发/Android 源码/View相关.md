@@ -1258,6 +1258,12 @@ iewRootImpl
 
 # ==View的工作流程==
 
+
+
+
+
+![ScreenClip](../../%E5%9B%BE%E5%BA%93/View%E7%9B%B8%E5%85%B3/ScreenClip.png)
+
 ==ViewRootImpl==在整个View体系中=起=着中流砥柱的作用，它是控件树正常运作的动力所在，并且有如下几个重要功能点。
 
 ```java
@@ -1267,6 +1273,16 @@ iewRootImpl
 负责与WMS交互通讯，调整窗口大小及布局。
 ```
 ## ViewRootImpl
+
+
+
+![ScreenClip](../../%E5%9B%BE%E5%BA%93/View%E7%9B%B8%E5%85%B3/ScreenClip-1623318296259.png)
+
+
+
+
+
+
 
 ![这里写图片描述](https://img-blog.csdn.net/20171128171005304?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcWlhbjUyMGFv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 
@@ -1731,7 +1747,7 @@ measureChildWithMargins()方法为ViewGroup提供的方法，根据父View的Mea
     //final类，子类不能重写该方法
     public final void measure(int widthMeasureSpec, int heightMeasureSpec) {
 
-            ``````
+``````
 
             onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
@@ -1742,7 +1758,7 @@ measureChildWithMargins()方法为ViewGroup提供的方法，根据父View的Mea
         setMeasuredDimension(
         getDefaultSize(getSuggestedMinimumWidth(), widthMeasureSpec),
         getDefaultSize(getSuggestedMinimumHeight(), heightMeasureSpec));
-
+    
     }
 
 
@@ -1750,7 +1766,7 @@ measureChildWithMargins()方法为ViewGroup提供的方法，根据父View的Mea
         int result = size;
         int specMode = MeasureSpec.getMode(measureSpec);
         int specSize = MeasureSpec.getSize(measureSpec);
-
+    
         switch (specMode) {
         case MeasureSpec.UNSPECIFIED:
             result = size;
@@ -1777,7 +1793,7 @@ measureChildWithMargins()方法为ViewGroup提供的方法，根据父View的Mea
 
 并且需要注意的是： View的mLeft，mTop，mRight，mBottom 这些坐标值是以父控件左上角为坐标原点进行计算的。倘若需要获取控件在窗口==坐标系中的位置==可以使用==View.GetLocationWindow()==或者是==View.getRawX()/Y()==。
 
-```java
+​```java
 //ViewRootImpl
     private void performLayout(WindowManager.LayoutParams lp, int desiredWindowWidth,int desiredWindowHeight) {
 
@@ -1832,10 +1848,10 @@ measureChildWithMargins()方法为ViewGroup提供的方法，根据父View的Mea
             //清除PFLAG_LAYOUT_REQUIRED标记
             mPrivateFlags &= ~PFLAG_LAYOUT_REQUIRED;
 
-            ``````
+``````
             //布局监听通知
         }
-
+    
         //清除PFLAG_FORCE_LAYOUT标记
         mPrivateFlags &= ~PFLAG_FORCE_LAYOUT;
     }
@@ -1848,7 +1864,7 @@ measureChildWithMargins()方法为ViewGroup提供的方法，根据父View的Mea
 
 然后调用onLayout()方法，使具体实现类接收到布局变更通知。如果此类是ViewGroup，还会遍历子View的layout()方法使其更新布局。如果调用的是onLayout()方法，这会导致子View无法调用setFrame()，从而无法更新控件坐标信息。
 
-```java
+​```java
 //View
 
     protected void onLayout(boolean changed, int l, int t, int r, int b) {}
@@ -1883,6 +1899,12 @@ measure结果对布局过程没有约束力。虽说子控件在onMeasure()方�
 完成performLayout()后，空间树的所有控件都已经确定了其最终位置，就剩下绘制了。
 ```
 ## draw
+
+
+
+
+
+![ScreenClip](C:/Users/hasee/AppData/Local/Temp/ScreenClip.png)
 
 我们先纯粹的看View的draw过程，因为这个过程相对上面measure和layout比较简单。
 
@@ -1951,7 +1973,7 @@ View的draw过程遵循如下几步 ：
             return;
         }
 
-        ``````
+``````
     }
 
 ```
@@ -1992,7 +2014,7 @@ View的isOpaque()方法返回值表示此控件是否为”实心”的，所谓
 
 ## View
 
-```java
+​```java
 //View
 
 
@@ -2040,7 +2062,7 @@ View的isOpaque()方法返回值表示此控件是否为”实心”的，所谓
                 damage.set(l, t, r, b);
                 p.invalidateChild(this, damage);
             }
-            ``````
+``````
         }
     }
 
@@ -2050,7 +2072,7 @@ View的isOpaque()方法返回值表示此控件是否为”实心”的，所谓
 
 ## ViewGroup
 
-```java
+​```java
 //ViewGroup
 
 
@@ -2064,15 +2086,15 @@ View的isOpaque()方法返回值表示此控件是否为”实心”的，所谓
                 RectF boundingRect = attachInfo.mTmpTransformRect;
                 boundingRect.set(dirty);
 
-                ``````  
+``````
                //父容器根据自身对子View的脏区域进行调整
-
+    
                 transformMatrix.mapRect(boundingRect);
                 dirty.set((int) Math.floor(boundingRect.left),
                         (int) Math.floor(boundingRect.top),
                         (int) Math.ceil(boundingRect.right),
                         (int) Math.ceil(boundingRect.bottom));
-
+    
             // 这里的do while方法，不断的去调用父类的invalidateChildInParent方法来传递重绘请求
             //直到调用到ViewRootImpl的invalidateChildInParent（责任链模式）
             do {
@@ -2080,7 +2102,7 @@ View的isOpaque()方法返回值表示此控件是否为”实心”的，所谓
                 if (parent instanceof View) {
                     view = (View) parent;
                 }
-
+    
                 if (drawAnimation) {
                     if (view != null) {
                         view.mPrivateFlags |= PFLAG_DRAW_ANIMATION;
@@ -2088,7 +2110,7 @@ View的isOpaque()方法返回值表示此控件是否为”实心”的，所谓
                         ((ViewRootImpl) parent).mIsAnimating = true;
                     }
                 }
-
+    
                 //如果父类是"实心"的，那么设置它的mPrivateFlags标识
                 // If the parent is dirty opaque or not dirty, mark it dirty with the opaque
                 // flag coming from the child that initiated the invalidate
@@ -2101,10 +2123,10 @@ View的isOpaque()方法返回值表示此控件是否为”实心”的，所谓
                         view.mPrivateFlags = (view.mPrivateFlags & ~PFLAG_DIRTY_MASK) | opaqueFlag;
                     }
                 }
-
+    
                 //***往上递归调用父类的invalidateChildInParent***
                 parent = parent.invalidateChildInParent(location, dirty);
-
+    
                 //设置父类的脏区域
                 //父容器会把子View的脏区域转化为父容器中的坐标区域
                 if (view != null) {
@@ -2131,7 +2153,7 @@ View的isOpaque()方法返回值表示此控件是否为”实心”的，所谓
 
 我们先验证一下最上层ViewParent为什么是ViewRootImpl
 
-```java
+​```java
 //ViewRootImpl
 
 
@@ -2178,10 +2200,10 @@ View的isOpaque()方法返回值表示此控件是否为”实心”的，所谓
             return null;
         }
 
-        ``````
+``````
 
         invalidateRectOnScreen(dirty);
-
+    
         return null;
     }
 
@@ -2193,11 +2215,11 @@ View的isOpaque()方法返回值表示此控件是否为”实心”的，所谓
             mAttachInfo.mSetIgnoreDirtyState = true;
             mAttachInfo.mIgnoreDirtyState = true;
         }
-
+    
         // Add the new dirty rect to the current one
         localDirty.union(dirty.left, dirty.top, dirty.right, dirty.bottom);    
         //在这里，mDirty的区域就变为方法中的dirty，即要重绘的脏区域
-
+    
         ``````
         if (!mWillDrawSoon && (intersected || mIsAnimating)) {
             scheduleTraversals();//执行View的工作流程
@@ -2211,7 +2233,7 @@ View的isOpaque()方法返回值表示此控件是否为”实心”的，所谓
 
 这个scheduleTraversals()很眼熟，我们一出场就在requestLayout()中见过，并且我们还说了mLayoutRequested用来表示是否measure和layout。
 
-```java
+​```java
 //ViewRootImpl
 
 
@@ -2335,7 +2357,7 @@ public void requestLayout() {
                 sizeChange(newWidth, newHeight, oldWidth, oldHeight);
             }
 
-            ``````
+``````
         }
         return changed;
     }
