@@ -1,4 +1,4 @@
-# ==Window 机制探索==
+# **==Window 机制探索==**
 
 ## Window的概念
 
@@ -2376,4 +2376,101 @@ public void requestLayout() {
 理清整体流程对我们android的布局，绘制，自定义View，和分析bug都有一个提升。
 
 有兴趣的还可以继续观看Android源码分析
+
+
+```
+
+# RecyclerView
+
+本系列博客基于`com.android.support:recyclerview-v7:26.1.0`
+ 1.[【进阶】RecyclerView源码解析(一)——绘制流程](https://www.jianshu.com/p/c52b947fe064)
+ 2.[【进阶】RecyclerView源码解析(二)——缓存机制](https://www.jianshu.com/p/e44961f8add5)
+ 3.[【进阶】RecyclerView源码解析(三)——深度解析缓存机制](https://www.jianshu.com/p/2b19e9bcda84)
+ 4.[【进阶】RecyclerView源码解析(四)——RecyclerView进阶优化使用](https://www.jianshu.com/p/52791ac320f6)
+ 5.[【框架】基于AOP的RecyclerView复杂楼层样式的开发框架，楼层打通，支持组件化，支持MVP(不用每次再写Adapter了～)](https://www.jianshu.com/p/f45e4bcb8d92)
+
+[ ViewPager 全面总结](https://blog.csdn.net/weixin_39251617/article/details/79399592)
+
+
+
+RecycleView总共分为==四级缓存==
+
+一级缓存mAttachedScrap缓存屏幕中可见范围的ViewHolder
+
+二级缓存mCachedViews缓存滑动时即将与RecyclerView分离的ViewHolder，按子View的position或id缓存，默认最多存放==2==个
+
+三级缓存mViewCacheExtension开发者自行实现的缓存--
+
+四级缓存mRecyclerPoolViewHolder缓存池，
+
+本质上是一个==SparseArray==，其中key是ViewType(int类型)，value存放的是 ArrayList< ViewHolder>，默认每个ArrayList中最多存放==5==个ViewHolderfalsetrueRecyclerView滑动时会触发onTouchEvent#onMove，回收及复用ViewHolder在这里就会开始
+
+**mAttachedScrap**（第一屏，可见）
+
+**mCachedViews(刚刚移除的)**
+
+**mRecyclerPool**（总的）
+
+1).它会先在mAttachedScrap中找，看要的View是不是刚刚剥离的，如果是就直接返回使用，
+
+2.如果不是，先在mCachedViews中查找，因为在mCachedViews中精确匹配，如果匹配到，就说明这个HolderView是刚刚被移除的，也直接返回，
+
+3).如果匹配不到就会最终到mRecyclerPool找，如果mRecyclerPool有现成的holderView实例，这时候就不再是精确匹配了，只要有现成的holderView实例就返回给我们使用，只有在mRecyclerPool为空时，才会调用onCreateViewHolder新建。
+
+一.mAttachedScrap到底有什么用？（第一屏，可见），第一次存放。用于插入一个数据进去的时候用到。滑动的时候不用到
+
+二.mCachedViews它的作用就是保存最新被移除的HolderView自定义ViewCacheExtension缓存作用，适用场景：**ViewHolder位置固定、内容固定、数量有限时使用，所以，mCachedViews、mViewCacheExtension、mRecyclerPool组成了回收复用的三级缓存，当RecyclerView要拿一个复用的HolderView时，获取优先级是mCachedViews > mViewCacheExtension > mRecyclerPool。由于一般而言我们是不会自定义mViewCacheExtension的。所以获取顺序其实就是mCachedViews > mRecyclerPool，**
+
+**取的原则**：mCachedViews > mRecyclerPoolmAttachedScrap不参与回收复用，只保存从在重新布局时，从RecyclerView中剥离的当前在显示的HolderView列表。所以，mCachedViews、mViewCacheExtension、mRecyclerPool组成了回收复用的三级缓存，当RecyclerView要拿一个复用的HolderView时，**获取优先级**是mCachedViews > mViewCacheExtension > mRecyclerPool。由于一般而言我们是不会自定义mViewCacheExtension的。所以获取顺序其实就是mCachedViews > mRecyclerPool，
+
+**存放过程**：mCachedViews------mRecyclerPool(一个静态类)在我们标记为Removed以为，会把这个HolderView移到mCachedViews中，如果mCachedViews已满，就利用先进先出原则，将mCachedViews中老的holderView移到mRecyclerPool中，然后再把新的HolderView加入到mCachedViews中。
+
+为什么这么设计多个缓存？**优化效率**：这里需要注意的是，在mAttachedScrap和mCachedViews中拿到的HolderView，因为都是精确匹配的，所以都是直接使用，不会调用onBindViewHolder重新绑定数据，只有在mRecyclerPool中拿到的HolderView才会重新绑定数据。正是有mCachedViews的存在，所以只有在RecyclerView来回滚动时，池子的使用效率最高，因为凡是从mCachedViews中取的HolderView是直接使用的，不需要重新绑定数据。mRecyclerPool容量是5mCachedViews容量是2，他们最多是7个，
+
+**为什么后面一直不用创建了呢?**一般只创建一屏！后面移出一个，然后就填充一个。
+
+**如何解决RecyclerView滑动卡顿问题**1）、根据需求修改RecyclerView默认的绘制缓存选项recyclerView.setItemViewCacheSize(20);
+
+```java
+recyclerView.setDrawingCacheEnabled(true);
+recyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+```
+
+当item会出现频繁的来回滑动时，可以通过setItemViewCacheSize（）设置mCachedViews的数量，这个缓存主要是不需要重新进行绑定数据；
+
+典型的是：用**空间换时间**的方法。
+使用多个RecyclerView，并且里面有相同item布局时，这时就可以通过setRecycledViewPool（）设置同一个RecycledViewPool；
+3).当是网格布局的时候，如果一行的item超过五个，需要通过setMaxRecycledViews（）去重新设置缓存的最大个数；
+
+4).可以使用setHasStableIds（true）进行设置（同时重写Adapter的getItemID（）方法），这时会复用到scrap缓存；
+
+5.局部刷新替代全局刷新。避免整个列表的数据更新，只更新受影响的布局。例如，加载更多时，不使用notifyDataSetChanged()，而是使用notifyItemRangeInserted(rangeStart, rangeEnd)
+
+6.快速滑动RecycleView卡顿解决办法
+
+（1）快速滑动RecycleView卡顿原因：因为，列表上下滑动的时候，RecycleView会在执行复用策略，onCreateViewHolder和onBindViewHolder会执行。==item视图创建或数据绑定的方法会随着滑动被多次执行==，容易造成卡顿。
+
+（2）解决==快速滑动造成的卡顿==一般都采用滑动关闭数据加载优化：
+
+主要是设置RecyclerView.addOnScrollListener();
+
+通过自定义一个滑动监听类继承onScrollListener抽象类，实现滑动状态改变的方法onScrollStateChanged(recycleview,state)，从而实现**在滑动过程中不加载，当滚动静止时，刷新界面，实现加载**。
+
+
+图片加载对于大量图片的RecyclerView考虑重写onScroll事件，滑动暂停后再加载这个我们平时就经常实现了，当长图片列表的时候，我们经常做这样的优化，防止图片的大量加载，毕竟图片一直是内存占用大户。
+
+# ViewPager
+
+传送门：
+传送门：
+[ViewPager系列一：初相识](https://blog.csdn.net/weixin_39095733/article/details/84109985)
+[ViewPager系列二： Adapter的爱恨情仇](https://blog.csdn.net/weixin_39095733/article/details/84207223)
+[ViewPager系列三：两个熊孩子天生不一样](https://blog.csdn.net/weixin_39095733/article/details/84309051)
+[ViewPager系列四：让ViewPager用起来更顺滑——换页监听及换页方法](https://blog.csdn.net/weixin_39095733/article/details/85256831)
+[ViewPager系列五：让ViewPager用起来更顺滑——懒加载及预加载定制](https://blog.csdn.net/weixin_39095733/article/details/85806359)
+[ViewPager系列六：让ViewPager用起来更顺滑——设置间距与添加转场动画](https://blog.csdn.net/weixin_39095733/article/details/85879886)
+[ViewPager系列七：让ViewPager用起来更顺滑——轮播、禁止滑动与指示器的配合](https://blog.csdn.net/weixin_39095733/article/details/86023134)
+[ViewPager系列八：一篇彻底读懂ViewPager源码（完结）](https://blog.csdn.net/weixin_39095733/article/details/86665756)
+
+
 

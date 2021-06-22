@@ -101,10 +101,48 @@ public MyViewModel(@NonNull Application application) {
 ### 使用
 
 ```java
-viewModel = new ViewModelProvider(this, new ViewModelProvider.AndroidViewModelFactory(getApplication())).get(MyViewModel.class);
+ MyViewModel model = ViewModelProviders.of(activity).get(MyViewModel.class);
+或
+ MyViewModel model = ViewModelProviders.of(fragment).get(MyViewModel.class);
+或带有 Factory 的
+     MyViewModel model = ViewModelProviders.of(activity，factory).get(MyViewModel.class);
+
 ```
 
+VM内部操作
 
+```php
+public class MyViewModel extends ViewModel {
+    private MutableLiveData<List<User>> users;
+    public LiveData<List<User>> getUsers() {
+        if (users == null) {
+            users = new MutableLiveData<List<User>>();
+            loadUsers();
+        }
+        return users;
+    }
+
+    private void loadUsers() {
+        // Do an asynchronous operation to fetch users.
+    }
+}
+```
+
+然后，可在 activity 观察数据变化：
+
+```java
+public class MyActivity extends AppCompatActivity {
+    public void onCreate(Bundle savedInstanceState) {
+        // Create a ViewModel the first time the system calls an activity's onCreate() method.
+        // Re-created activities receive the same MyViewModel instance created by the first activity.
+
+        MyViewModel model = ViewModelProviders.of(this).get(MyViewModel.class);
+        model.getUsers().observe(this, users -> {
+            // update UI
+        });
+    }
+}
+```
 
 ## ==LiveData==
 
@@ -240,11 +278,11 @@ createFromAsset()和createFromFile()创建Room数据库
 
 ## ==Navigation==
 
-
+[网课资源](https://www.bilibili.com/video/BV1k7411f7TN?from=search&seid=3676597405115529209)
 
 ### 主要元素
 
-#### Navigation Graph 
+#### Navigation Graph
 
  一种新的xml资源文件 包含应用程序的所有页面，以及页面之间的关系
 

@@ -2619,7 +2619,7 @@ mPath.moveTo    移动到操作起始点坐标，不会进行绘制，只用于�
  由 P1 至 P2 的连续点 Q1，描述一条线性贝塞尔曲线。
  由 Q0 至 Q1 的连续点 B(t)，描述一条二次贝塞尔曲线。
 
-![img](https://upload-images.jianshu.io/upload_images/8669504-6ff436a3d7f661c2.gif?imageMogr2/auto-orient/strip|imageView2/2/w/360)
+![img](https://upload-images.jianshu.io/upload_images/8669504-6ff436a3d7f661c2.gif?imageMogr2/auto-orient/strip|imageView2/2/w/360)+
 
 对于三次曲线，可由线性贝塞尔曲线描述的中介点 Q0、Q1、Q2，和由二次曲线描述的点 R0、R1 所建构
 
