@@ -3618,6 +3618,10 @@ btn2.setOnClickListener {
 
 ### 元素共享
 
+
+
+Fragment之间元素共享动画（https://www.codingsky.com/doc/android/issue/fragment-transitions-with-shared-elements.html）
+
 Shared  elements转换确定两个Activity之间共享的视图如何在这两个Activity之间转换。例如，如果两个Activity在不同的位置和大小中具有相同的图像，则通过Shared elements转换会在这两个Activity之间平滑地转换和缩放图像。
 
 <img src="http://5b0988e595225.cdn.sohucs.com/images/20190619/456e082f9c4a41d1b68098aa22aa1ffc.jpeg" alt="img" style="zoom:200%;" />
@@ -4497,11 +4501,11 @@ createCircularReveal(View view, int centerX, int centerY, float startRadius, flo
 
 
 
+# Material Design
 
 
 
-
-
+[一个很好的学习资源](https://www.jianshu.com/p/5dfed8a3a017)
 
 
 

@@ -531,7 +531,7 @@ class Person
 {
 public:
 	Person(NameType name, AgeType age)
-	{
+	{              
 		this->mName = name;
 		this->mAge = age;
 	}

@@ -5698,3 +5698,5 @@ textview.animate().x(500).y(500).setDuration(5000)
 
 想研究各种动画是如何实现的可自行查看源码~
 
+# Material Design
+

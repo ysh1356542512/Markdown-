@@ -2275,6 +2275,20 @@ View的isOpaque()方法返回值表示此控件是否为”实心”的，所谓
 
 ![Idtk--View的invalidate](https://img-blog.csdn.net/20171202180025700?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcWlhbjUyMGFv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 
+
+
+# WMS
+
+
+
+
+
+
+
+
+
+
+
 # requestLayout
 
 看完了`invalidate()`流程之后，`requestLayout()`流程就比较好上手了。

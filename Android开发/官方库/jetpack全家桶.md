@@ -1,5 +1,13 @@
 # Jetpack全家桶
 
+[b站学习资源](https://www.bilibili.com/video/BV1Ry4y1t7Tj?from=search&seid=15997079515328130450)
+
+## 演示
+
+[示例(https://github.com/hegaojian/JetpackMvvm)
+
+[![项目效果图](https://camo.githubusercontent.com/df839abc59d77536e6d2b1df0d5abab31a0fcc7664f54def9155d695777ed700/68747470733a2f2f75706c6f61642d696d616765732e6a69616e7368752e696f2f75706c6f61645f696d616765732f393330353735372d383138313036323235646430316536352e6769663f696d6167654d6f6772322f6175746f2d6f7269656e742f7374726970)](https://camo.githubusercontent.com/df839abc59d77536e6d2b1df0d5abab31a0fcc7664f54def9155d695777ed700/68747470733a2f2f75706c6f61642d696d616765732e6a69616e7368752e696f2f75706c6f61645f696d616765732f393330353735372d383138313036323235646430316536352e6769663f696d6167654d6f6772322f6175746f2d6f7269656e742f7374726970)
+
 
 
 ## ==Lifecycle==
@@ -885,7 +893,7 @@ public class ImageViewBindingAdapter {
     //加载网络图片
     @BindingAdapter("itemImage")
     public static void setImage(ImageView imageView, String url){
-        if(!TextUtils.isEmpty(url)){
+        if(!TextUtils.isEmpty(urdl)){
             Picasso.get()
                     .load(url)
                     .placeholder(R.drawable.ic_launcher_background)
