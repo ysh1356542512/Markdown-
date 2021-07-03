@@ -726,3 +726,445 @@ https://blog.csdn.net/u013762572/article/details/88954561
 
 # Fragment
 
+
+
+
+
+# AlertDialog
+
+![img](https://images2018.cnblogs.com/blog/1255627/201803/1255627-20180304232917390-1238873465.png)
+
+## 系统对话框的几种类型与实现
+
+在项目的实际开发中，用到的系统对话框几乎是没有的。原因大概包含以下几点：
+
+> - 样式过于单一，不能满足大部分实际项目中的需求。
+> - 对话框的样式会根据手机系统版本的不同而变化。不能达到统一的样式。
+> - 能实现的功能过于简单。
+
+在这里先附上下面代码中出现文本的`string.xml`文件。
+
+```kotlin
+<string name="dialog_normal_content">我是普通dialog</string>
+<string name="dialog_normal_more_button_content">我是普通多按钮dialog</string>
+<string name="dialog_btn_confirm_text">确定</string>
+<string name="dialog_btn_cancel_text">取消</string>
+<string name="dialog_btn_neutral_text">忽略</string>
+<string name="dialog_btn_confirm_hint_text">您点击了确定按钮</string>
+<string name="dialog_btn_cancel_hint_text">您点击了取消按钮</string>
+<string name="dialog_btn_neutral_hint_text">您点击了忽略按钮</string>
+```
+
+**1、普通对话框**
+
+在实际项目开发中，此类型对话框中用到的地方要比其他类型的对话框多一些。但是考虑`UI`统一问题，也会很少用。
+
+*运行截图：*
+ ![img](https://images2018.cnblogs.com/blog/1255627/201803/1255627-20180304234648352-1936497754.png)
+
+*代码：*
+
+```kotlin
+  private void showNormalDialog(){
+    //创建dialog构造器
+    AlertDialog.Builder normalDialog = new AlertDialog.Builder(this);
+    //设置title
+    normalDialog.setTitle(getString(R.string.dialog_normal_text));
+    //设置icon
+    normalDialog.setIcon(R.mipmap.ic_launcher_round);
+    //设置内容
+    normalDialog.setMessage(getString(R.string.dialog_normal_content));
+    //设置按钮
+    normalDialog.setPositiveButton(getString(R.string.dialog_btn_confirm_text)
+            , new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            Toast.makeText(DialogActivity.this,getString(R.string.dialog_btn_confirm_hint_text)
+                    ,Toast.LENGTH_SHORT).show();
+            dialog.dismiss();
+        }
+    });
+    //创建并显示
+    normalDialog.create().show();
+  }
+```
+
+系统对话框都是支持链式调用的，举例：
+
+```kotlin
+    new AlertDialog.Builder(this)
+            .setTitle(getString(R.string.dialog_normal_text))
+            .setIcon(R.mipmap.ic_launcher_round)
+            .setMessage(getString(R.string.dialog_normal_content))
+            .setPositiveButton(getString(R.string.dialog_btn_confirm_text)
+                    , new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(DialogActivity.this,getString(R.string.dialog_btn_confirm_hint_text)
+                            ,Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                }
+            })
+            .create()
+            .show();
+```
+
+下面的代码都是可以用链式调用的，这里就不展示了。
+
+**2、普通对话框(多按钮)**
+
+在系统对话框中最多出现三个按钮，即`PositiveButton`（确定）、`NegativeButton`（取消）、`NeutralButton`（忽略）。
+
+*运行截图：*
+ ![img](https://images2018.cnblogs.com/blog/1255627/201803/1255627-20180304234701273-1958338007.png)
+
+*代码：*
+
+```kotlin
+  private void showNormalMoreButtonDialog(){
+    AlertDialog.Builder normalMoreButtonDialog = new AlertDialog.Builder(this);
+    normalMoreButtonDialog.setTitle(getString(R.string.dialog_normal_more_button_text));
+    normalMoreButtonDialog.setIcon(R.mipmap.ic_launcher_round);
+    normalMoreButtonDialog.setMessage(getString(R.string.dialog_normal_more_button_content));
+
+    //设置按钮
+    normalMoreButtonDialog.setPositiveButton(getString(R.string.dialog_btn_confirm_text)
+            , new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(DialogActivity.this
+                            ,getString(R.string.dialog_btn_confirm_hint_text),Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                }
+            });
+    normalMoreButtonDialog.setNegativeButton(getString(R.string.dialog_btn_cancel_text)
+            , new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(DialogActivity.this,
+                            getString(R.string.dialog_btn_cancel_hint_text),Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                }
+            });
+    normalMoreButtonDialog.setNeutralButton(getString(R.string.dialog_btn_neutral_text)
+            , new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(DialogActivity.this,
+                            getString(R.string.dialog_btn_neutral_hint_text),Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                }
+            });
+
+    normalMoreButtonDialog.create().show();
+  }
+```
+
+也可以用下面的实现方式，和上面的代码效果是一样的。k
+
+```kotlin
+  private void showNormalMoreButtonDialog(){
+    DialogInterface.OnClickListener setListener = null;
+
+    AlertDialog.Builder normalMoreButtonDialog = new AlertDialog.Builder(this);
+    normalMoreButtonDialog.setTitle(getString(R.string.dialog_normal_more_button_text));
+    normalMoreButtonDialog.setIcon(R.mipmap.ic_launcher_round);
+    normalMoreButtonDialog.setMessage(getString(R.string.dialog_normal_more_button_content));
+   
+    setListener = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            switch (which){
+                case DialogInterface.BUTTON_POSITIVE:
+                    Toast.makeText(DialogActivity.this,
+                            getString(R.string.dialog_btn_confirm_hint_text),Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                    break;
+                case DialogInterface.BUTTON_NEUTRAL:
+                    Toast.makeText(DialogActivity.this
+                            ,getString(R.string.dialog_btn_neutral_hint_text),Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                    break;
+                case DialogInterface.BUTTON_NEGATIVE:
+                    Toast.makeText(DialogActivity.this
+                            ,getString(R.string.dialog_btn_cancel_hint_text),Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                    break;
+            }
+        }
+    };
+    normalMoreButtonDialog.setPositiveButton(getString(R.string.dialog_btn_confirm_text),setListener);
+    normalMoreButtonDialog.setNegativeButton(getString(R.string.dialog_btn_cancel_text),setListener);
+    normalMoreButtonDialog.setNeutralButton(getString(R.string.dialog_btn_neutral_text),setListener);
+
+    normalMoreButtonDialog.create().show();
+  }
+```
+
+**3、普通列表对话框**
+
+此种类型的对话框能实现简单的列表。
+
+*运行截图：*
+ ![img](https://images2018.cnblogs.com/blog/1255627/201803/1255627-20180304234715483-628362255.png)
+
+*代码：*
+
+```kotlin
+  /**
+   * 普通列表dialog
+   */
+  private void showListDialog(){
+    final String listItems[] = new String[]{"listItems1","listItems2","listItems3",
+            "listItems4","listItems5","listItems6"};
+
+    AlertDialog.Builder listDialog = new AlertDialog.Builder(this);
+    listDialog.setTitle(getString(R.string.dialog_list_text));
+    listDialog.setIcon(R.mipmap.ic_launcher_round);
+
+    /*
+        设置item 不能用setMessage()
+        用setItems
+        items : listItems[] -> 列表项数组
+        listener -> 回调接口
+    */
+    listDialog.setItems(listItems,new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            Toast.makeText(DialogActivity.this,listItems[which],Toast.LENGTH_SHORT).show();
+        }
+    });
+
+    //设置按钮
+    listDialog.setPositiveButton(getString(R.string.dialog_btn_confirm_text)
+            , new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+
+    listDialog.create().show();
+  }
+```
+
+**4、单选对话框**
+
+*运行截图：*
+ ![img](https://images2018.cnblogs.com/blog/1255627/201803/1255627-20180304234744067-1550847957.png)
+
+*代码：*
+
+```kotlin
+  private void showRadioDialog(){
+    final String radioItems[] = new String[]{"radioItem1","radioItem1","radioItem1","radioItem1"};
+
+    AlertDialog.Builder radioDialog = new AlertDialog.Builder(this);
+    radioDialog.setTitle(getString(R.string.dialog_radio_text));
+    radioDialog.setIcon(R.mipmap.ic_launcher_round);
+
+    /*
+        设置item 不能用setMessage()
+        用setSingleChoiceItems
+        items : radioItems[] -> 单选选项数组
+        checkItem : 0 -> 默认选中的item
+        listener -> 回调接口
+    */
+    radioDialog.setSingleChoiceItems(radioItems, 0, new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            Toast.makeText(DialogActivity.this,radioItems[which],Toast.LENGTH_SHORT).show();
+        }
+    });
+
+    //设置按钮
+    radioDialog.setPositiveButton(getString(R.string.dialog_btn_confirm_text)
+            , new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+
+    radioDialog.create().show();
+  }
+```
+
+**5、多选对话框**
+
+*运行截图：*
+ ![img](https://images2018.cnblogs.com/blog/1255627/201803/1255627-20180304234757320-1623676885.png)
+
+*代码：*
+ private void showCheckBoxDialog(){
+
+```kotlin
+    final String checkBoxItems[] = new String[]{"checkBoxItems1","checkBoxItems2",
+            "checkBoxItems3","checkBoxItems4"};
+    final boolean isCheck[] = new boolean[]{false,true,true,false};
+
+    AlertDialog.Builder checkBoxDialog = new AlertDialog.Builder(this);
+    checkBoxDialog.setTitle(getString(R.string.dialog_check_box_text));
+    checkBoxDialog.setIcon(R.mipmap.ic_launcher_round);
+
+    /*
+        设置item 不能用setMessage()
+        用setMultiChoiceItems
+        items : radioItems[] -> 多选选项数组
+        checkItems : isCheck[] -> 是否选中数组
+        listener -> 回调接口
+    */
+    checkBoxDialog.setMultiChoiceItems(checkBoxItems, isCheck
+            , new DialogInterface.OnMultiChoiceClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+            if (isChecked){
+                Toast.makeText(DialogActivity.this,
+                        checkBoxItems[which] + "   选中",Toast.LENGTH_SHORT).show();
+            }else {
+                Toast.makeText(DialogActivity.this,
+                        checkBoxItems[which] + "   未选中",Toast.LENGTH_SHORT).show();
+            }
+        }
+    });
+
+    //设置按钮
+    checkBoxDialog.setPositiveButton(getString(R.string.dialog_btn_confirm_text)
+            , new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+
+    checkBoxDialog.create().show();
+  }
+```
+
+**6、带输入框的弹窗**
+
+*运行截图：*
+ ![img](https://images2018.cnblogs.com/blog/1255627/201803/1255627-20180304234808202-673299833.png)
+
+*代码：*
+ private void showEditDialog(){
+
+```kotlin
+    final EditText edit = new EditText(this);
+
+    AlertDialog.Builder editDialog = new AlertDialog.Builder(this);
+    editDialog.setTitle(getString(R.string.dialog_edit_text));
+    editDialog.setIcon(R.mipmap.ic_launcher_round);
+
+    //设置dialog布局
+    editDialog.setView(edit);
+
+    //设置按钮
+    editDialog.setPositiveButton(getString(R.string.dialog_btn_confirm_text)
+            , new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(DialogActivity.this,
+                            edit.getText().toString().trim(),Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                }
+            });
+
+    editDialog.create().show();
+  }
+```
+
+**7、自定义布局的对话框**
+
+此类型的对话框在实际项目开发中用到的地方比提示对话框用到的地方要多一些，不过在项目几乎上都是自定义的对话框...
+
+*运行截图：*
+ ![img](https://images2018.cnblogs.com/blog/1255627/201803/1255627-20180304234818225-569363107.png)
+
+*布局文件：custom_dialog_layout.xml*
+ 
+
+```kotlin
+      <TextView
+           android:id="@+id/dialog_text"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:textSize="15sp"
+           android:textColor="@color/colorPrimary"
+           android:gravity="center"
+           android:padding="12dp"/>
+
+      <RelativeLayout
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content">
+
+           <ImageView
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:src="@mipmap/ic_launcher"/>
+
+          <Button
+              android:id="@+id/dialog_btn_confirm"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:textColor="@color/colorAccent"
+              android:textSize="15sp"
+              android:text="@string/dialog_btn_confirm_text"
+              android:layout_centerHorizontal="true"/>
+
+          <Button
+              android:id="@+id/dialog_btn_cancel"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:textColor="@color/colorAccent"
+              android:textSize="15sp"
+              android:text="@string/dialog_btn_cancel_text"
+              android:layout_centerHorizontal="true"
+              android:layout_alignParentRight="true"/>
+
+      </RelativeLayout>
+
+  </LinearLayout>
+```
+
+*代码：*
+
+```kotlin
+  private void showLayoutDialog() {
+    //加载布局并初始化组件
+    View dialogView = LayoutInflater.from(this).inflate(R.layout.custom_dialog_layout,null);
+    TextView dialogText = (TextView) dialogView.findViewById(R.id.dialog_text);
+    Button dialogBtnConfirm = (Button) dialogView.findViewById(R.id.dialog_btn_confirm);
+    Button dialogBtnCancel = (Button) dialogView.findViewById(R.id.dialog_btn_cancel);
+
+    final AlertDialog.Builder layoutDialog = new AlertDialog.Builder(this);
+    layoutDialog.setTitle(getString(R.string.dialog_custom_layout_text));
+    layoutDialog.setIcon(R.mipmap.ic_launcher_round);
+
+    layoutDialog.setView(dialogView);
+
+    //设置组件
+    dialogText.setText("我是自定义layout的弹窗！！");
+    dialogBtnConfirm .setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Toast.makeText(DialogActivity.this,"我是自定义layout的弹窗！！",Toast.LENGTH_SHORT).show();
+        }
+    });
+    dialogBtnConfirm .setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            layoutDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    dialog.dismiss();
+                }
+            });
+        }
+    });
+
+    layoutDialog.create().show();
+  }
+```
+
+以上就是`Android`系统弹窗的几种实现方式，几乎涵盖了能解决各种简单需求。其中自定义布局的方式奠定了自定义弹窗的基本实现。
