@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/jcstress/jcstress.iml" filepath="$PROJECT_DIR$/jcstress/jcstress.iml" />
+      <module fileurl="file://$PROJECT_DIR$/jmh/jmh.iml" filepath="$PROJECT_DIR$/jmh/jmh.iml" />
+      <module fileurl="file://$PROJECT_DIR$/jvm.iml" filepath="$PROJECT_DIR$/jvm.iml" />
+      <module fileurl="file://$PROJECT_DIR$/jvm6/jvm6.iml" filepath="$PROJECT_DIR$/jvm6/jvm6.iml" />
+      <module fileurl="file://$PROJECT_DIR$/jvm_maven/jvm_maven.iml" filepath="$PROJECT_DIR$/jvm_maven/jvm_maven.iml" />
+    </modules>
+  </component>
+</project>

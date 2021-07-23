@@ -1,0 +1,8 @@
+test\ConcurrencyTest.class
+org\openjdk\jcstress\infra\results\I_Result_jcstress_c1.class
+test\SingletonTest.class
+org\openjdk\jcstress\infra\results\I_Result_jcstress_c2.class
+test\SingletonTest_jcstress.class
+META-INF\TestList
+test\Singleton.class
+org\openjdk\jcstress\infra\results\I_Result_jcstress.class

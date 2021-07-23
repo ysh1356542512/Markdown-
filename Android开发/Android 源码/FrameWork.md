@@ -50,3 +50,19 @@ FrameWork层源码的分析
 
 [activity 启动模式_Activity启动流程详解（基于api28）](https://blog.csdn.net/weixin_39872334/article/details/111179933)
 
+![img](../../%E5%9B%BE%E5%BA%93/FrameWork/%5DCRI64IKD1BDCJ%7BVD6I%7D%60%250.png)
+
+
+
+
+
+![img](../../%E5%9B%BE%E5%BA%93/FrameWork/32O_%25CW7ZHGO8P$TMKRZJN5.png)
+
+
+
+
+
+Activity生命周期的管理
+
+![img](../../%E5%9B%BE%E5%BA%93/FrameWork/E%25URHIGMP5PBYJAY%5DBL%60UL.png)
+

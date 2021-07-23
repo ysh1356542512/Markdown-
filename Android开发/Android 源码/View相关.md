@@ -1,4 +1,4 @@
-# **==Window 机制探索==**
+# **=Window 机制探索==**
 
 ## Window的概念
 
@@ -2278,6 +2278,26 @@ View的isOpaque()方法返回值表示此控件是否为”实心”的，所谓
 
 
 # WMS
+
+![img](../../%E5%9B%BE%E5%BA%93/View%E7%9B%B8%E5%85%B3/%5DCRI64IKD1BDCJ%7BVD6I%7D%60%250.png)
+
+
+
+
+
+## 心得
+
+setcentview 里面创建了decorview 但是没有与Activity关联
+
+在onresurme的时候才关联在一起  才可以进行刷新流程  在那之前ui并没有进行刷新
+
+
+
+![img](../../%E5%9B%BE%E5%BA%93/View%E7%9B%B8%E5%85%B3/NCI9$D6CTD%5DXNP%5BFE7T4BOB-1626706585334.png)
+
+
+
+![](../../%E5%9B%BE%E5%BA%93/View%E7%9B%B8%E5%85%B3/dsadas.png)
 
 
 

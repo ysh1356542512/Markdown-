@@ -4227,6 +4227,64 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+# 回调方法
+
+## onFinishInflate
+
+**从字面上来看这个方法的作用就是在完成View的布局实例化后的回调，关于布局实例化的内容（LayoutInflater）的学习网址：LayoutInflater原理，通过对这篇博客的
+学习可以得知：这个回调方法是在整个布局文件都实例化结束后每个View才进行回调，或者说是在控件及其子控件都实例化结束后每个View才进行的回调。
+
+ps:这个回调是发生在视图实例化的过程中，一般在activity的oncreate方法中，并且==只有在布局文件中实例化才有会==这个==回调==。
+
+当我们的XML布局被加载完后，就会回调onFinshInfalte这个方法，在这个方法中我们可以初始化控件和数据。
+
+## onSizeChange
+
+ 根据size和change以及这个方法的参数名称推断这个方法是在视图的大小发生改变后的回调，而视图的大小改变时机肯定==包括layout方法==，所以这个回调方法肯定是在layout方法之中调用，除了网上的资料可以证明，我自己查阅了layout源代码(sdk20)也确实是这样的，原图如下：
+
+![img](https://img-blog.csdn.net/20161206132336290?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center)
+
+其中setOpticalFrame方法也是调用setFrame方法，setFrame方法核心代码如下（sdk20）：
+
+![img](https://img-blog.csdn.net/20161206134121095?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center)
+
+从上面两张图可以看出两点：
+1）layout方法直接把四个参数赋值给对应的控件坐标变量(mLeft,mTop,mRight,mBottom)，也就是确定了控件的区域；
+2）如果==旧的宽度和高度任意一个发生了改变都会调用sizeChange方法==，而sizeChange方法里面就是onSizeChange方法。
+ps:layout中发生的onSizeChange回调是属于绘制过程中的。
+
+# View的移动
+
+## [ScrollTo原理](https://blog.csdn.net/weixin_43298955/article/details/104850764)
+
+->其实最终是移动的画布
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -5701,4 +5759,213 @@ textview.animate().x(500).y(500).setDuration(5000)
 # Material Design
 
 [博客资源](https://www.jianshu.com/p/776cc6329fff)
+
+## CoordinatorLayout
+
+
+
+==两个作用==：
+
+1.顶部的layout装饰
+
+2.一个容器和其他一个或者多个子View的交互
+ 通常和 CoordinatorLayout.Behavior<V extends View> 一起使用。
+ 当然，如果是和固定关联，也可以用注解去操作。
+ 比如，@DefaultBehavior(MyBehavior.class)
+
+==做什么？==
+ CoordinatorLayout布局是一个`调度者，中心指挥者`，在它布局下的所有的直接子View可以通过`Behavior`来和CoordinatorLayout中心指挥者通信。中心指挥者就可以根据Behavior来为子View指定依赖的同级View、嵌套滑动、事件拦截。
+
+==怎么做？==
+ CoordinatorLayout比较常用在`嵌套滑动或者吸顶效果`上，实现方式也比较简单。一般CoordinatorLayout会有三层结构，如下图所示。CoordinatorLayout作为一个滑动布局的最外层，里面包裹一个`AppBarLayout`和一个可以滑动的`NestedSV、RecyclerView、ViewPager`等。
+
+![img](https://upload-images.jianshu.io/upload_images/22650779-bb3a81e48cd5f5bf.png?imageMogr2/auto-orient/strip|imageView2/2/w/742)
+
+`AppBarLayout`: 这是一个已实现 `Behavior`的`LinearLayout`，在AppBarLayout的==Behavior==已实现了嵌套滑动功能，所以在AppBarLayout包裹的子View也可以滑动，如果子View想要滑出屏幕外则必须要设置AppBarLayout为之提供的`scrollFlags`。如果想要实现吸顶效果，则子View不设置scrollFlags即可。
+
+**AppBarLayout的提供scrollFlags:**
+**1.app:layout_scrollFlags="scroll|exitUntilCollapsed"**
+ 这种符合顶部逻辑，则最先滑出屏幕，最后滑进屏幕
+
+![img](https://upload-images.jianshu.io/upload_images/22650779-725e1b97393e7f02.gif?imageMogr2/auto-orient/strip|imageView2/2/w/590)
+
+
+
+**2.app:layout_scrollFlags="scroll|enterAlways"**
+ 最先滑出屏幕，也最先滑进屏幕。
+
+![img](https://upload-images.jianshu.io/upload_images/22650779-f06c9adc18b75cd8.gif?imageMogr2/auto-orient/strip|imageView2/2/w/590)
+
+**3.app:layout_scrollFlags="scroll|snap"**
+ 在你停止滑动时，如果View的显示大于75%,则自动显示全部，如果View的显示小于25%,则自动隐藏全部。
+
+![img](https://upload-images.jianshu.io/upload_images/22650779-1e3025aa002828b4.gif?imageMogr2/auto-orient/strip|imageView2/2/w/590)
+
+对于其他==没有实现`Behavior`==的可滑动子View,如果只是需要配合一起嵌套滑动，那么则可以设置Behavior为AppBarLayout的滑动Behavior：
+
+```bash
+app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
+```
+
+![img](https://upload-images.jianshu.io/upload_images/22650779-ace7b6d4e9d0258d.png?imageMogr2/auto-orient/strip|imageView2/2/w/1120)
+
+### Behavior
+
+
+
+https://www.jianshu.com/p/e8f14a1f16a3
+
+
+
+![img](https://upload-images.jianshu.io/upload_images/2800913-9d0211e3e8802f09.gif?imageMogr2/auto-orient/strip|imageView2/2/w/448)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## AppBarLayout
+
+本质其实就是一个垂直方向上的 线性布局
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Toolbar
+
+
+
+
+
+
+
+
+
+
+
+## DrawerLayout
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## FloatingActionButton
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Snackbar
+
+
+
+
+
+
+
+
+
+## CardView
+
+
+
+
+
+
+
+
+
+
+
+
+
+## CollapsingToolbarLayout
+
+它是不能够独立存在
+
+
+
+
+
+
+
+
+
+
+
+## SwipeRefreshLayout
 

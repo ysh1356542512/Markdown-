@@ -4556,15 +4556,25 @@ createCircularReveal(View view, int centerX, int centerY, float startRadius, flo
 事件都不会再交给它处理，并且重新由它的父元素处理（父元素onTouchEvent被调用）
 
 4. 事件的分发过程是由外向内的，即事件总是先传递给父元素，然后再由父元素分发给子view，通过requestDisalowInterceptTouchEvent方法可以再子View中干预父元素的事件分发过程，但DOWN事件除外
-
 5. ViewGroup默认不拦截任何事件，即onInterceptTouchEvent默认返回fasle。view没有onInterceptTouchEvent方法调用一旦有点击事件传递给它，那么它的onToucheEvent就会被调用
-
 6. Viw的onTouchEvent默认会消耗事件，除非它是不可点击的（clickable和longClickabke同时为false）。view的longClickable默认都为false，clickable要分情况，不如button的clickable默认为true，TextView的clickable默认为false。
-
 7. View的enable属性不影响onTouchenEvent的默认返回值。哪怕一个view是disable状态的，只要它的clickable或者longClickabel有一个为true，那么它的onTouchEvent就会返回true。
-
 8. onClick会响应的前提是当前View是可点击的，并且收到了DOWN和UP的事件，并且受长按事件的影响，当长按事件返回true时，onClick不会响应。
-
 9. onLongClick在DOWN里判断是否进行响应，要想执行长按事件该View必须是longClickable的并且设置了OnLongClickListener。
 
-   
+
+
+# 效果实列思路
+
+## Tablayout
+
+
+
+
+
+![IMG_20210705_230323](../../%E5%9B%BE%E5%BA%93/%E8%87%AA%E5%AE%9A%E4%B9%89view%E4%B8%AD%E7%BA%A7/IMG_20210705_230323.jpg)
+
+https://www.bilibili.com/video/BV1kz4y1y7wC?p=5&spm_id_from=pageDriver
+
+## 复杂首页布局
+

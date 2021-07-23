@@ -698,6 +698,543 @@ https://blog.csdn.net/u013762572/article/details/88954561
 
 
 
+## LayoutManager
+
+`LayoutManager`是`RecyclerView`中的重要一环，使用`LayoutManager`就跟玩捏脸蛋的游戏一样，即使好看的五官(好看的子View)都具备了，也不一定能捏出漂亮的脸蛋，好在`RecyclerView`为我们提供了默认的模板：`LinearLayoutManager`、`GridLayoutManager`和`StaggeredGridLayoutManager`。
+
+说来惭愧，如果不是看了`GridLayoutManager`的源码，我还真不知道`GridLayoutManager`竟然可以这么使用，图片来自网络：
+
+
+
+![img](https://upload-images.jianshu.io/upload_images/9271486-a4caac043f97b159.jpg?imageMogr2/auto-orient/strip|imageView2/2/w/343)
+
+不过呢，今天我们讲解的源码不是来自`GridLayoutManager`，而是线性布局`LinearLayoutManager`（`GridLayoutManager`也是继承自`LinearLayoutManager`），分析完源码，我还将给大家带来实战，完成以下的效果：
+
+![img](https://upload-images.jianshu.io/upload_images/9271486-e651f7d009138c19.jpeg?imageMogr2/auto-orient/strip|imageView2/2/w/340)
+
+
+
+
+ 时间轴的效果来自[TimeLine](https://links.jianshu.com/go?to=https%3A%2F%2Fgithub.com%2Fvivian8725118%2FTimeLine)，自己稍微处理了一下，现在开始进入正题。
+
+
+
+代码地址：[https://github.com/mCyp/Orient-Ui](https://links.jianshu.com/go?to=https%3A%2F%2Fgithub.com%2FmCyp%2FOrient-Ui)
+
+### 目录
+
+![img](https://upload-images.jianshu.io/upload_images/9271486-f8f9b8474b31098c.png?imageMogr2/auto-orient/strip|imageView2/2/w/773)
+
+
+
+### 源码分析
+
+
+
+本着认真负责的精神，我把`RecyclerView`中用到`LayoutManager`的地方大致看了一遍，发现其负责的主要业务：
+
+- 回收和复用子View（当然，这会交给`Recyler`处理）。
+- ==测量和布局子View==。
+- ==关于滑动的处理==。
+
+回收和复用子`View`显然不是`LayoutManager`实际完成的，不过，子`View`的新增和删除都是`LayoutManager`通知的，除此以外，滑动处理的本质还是对子`View`进行管理，所以，本文要讨论的只有测量和布局子`View`的。
+
+测量和布局子`View`发生在`RecyclerView`三大工作流程，又...又回到了最初的起点？这是我们在上篇讨论过的，如果不涉及到`LayoutManager`的知识，我们将一笔带过即可。
+
+
+
+### GridLayoutManager
+
+　RecyclerView的其他代码就不展示了，这些代码在我的博客里有很多，这里说明我们关注的GridLayoutManager部分代码。如下将GridLayoutManager设置到RecyclerView，实现一个4列的网格列表。
+
+```java
+    GridLayoutManager layoutManager = new GridLayoutManager(this, 4);//第二个参数为网格的列数
+        mRecyclerView.setLayoutManager(layoutManager);
+```
+
+**注意！**如果你发现你的item填不满一行或者一行的左右两边还有很多空间，其实是你的item的布局宽度不是**match_parent**导致的　
+
+效果图：
+
+![img](https://img2020.cnblogs.com/blog/1497956/202006/1497956-20200603141455315-694953528.png)
+
+
+
+##### 改item尺寸
+
+假设现在有需求，希望第1个item，单独占据一行的全部空间。我们可以使用setSpanSizeLookup方法实现这一需求：
+
+代码：
+
+
+
+```java
+   GridLayoutManager layoutManager = new GridLayoutManager(this, 4);
+        mRecyclerView.setLayoutManager(layoutManager);
+        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                if (position == 0){
+                    return 4;
+                }
+                return 1;
+            }
+        });
+```
+
+使用返回的position来判断指定位置的item，然后返回占据的列数。**请注意！这里一开始特别容易错误理解，**这里的返回值其实是表达我们希望这个item占据多少位置。在上面实例GridLayoutManager第二个参数我们写了4，就代表最多的列数只有4列，如果我们希望指定item占据整行就要返回 4 ， 然后剩下的其他item只占据1位。另外这里不能返回大于我们实例设置的列数，如果我这里返回5，就会出现报错。
+
+效果图:
+
+![img](https://img2020.cnblogs.com/blog/1497956/202006/1497956-20200603142948186-653644805.png)
+
+==请注意==，这里别使用**mRecyclerView.getChildCount()**来获取item的数量，在getSpanSize方法调用时，RecyclerView其实还在onMeasure，获取的item数量还在增值。
+
+效果图 ：
+
+![img](https://img2020.cnblogs.com/blog/1497956/202006/1497956-20200603144926941-467560132.png)
+
+
+
+#### 随时修改列数
+
+```java
+mGridLayoutManager = new GridLayoutManager(this, count);
+        mRecyclerView.setLayoutManager(mGridLayoutManager);
+        mRecyclerView.setAdapter(mRecyclerViewAdapter);
+        mAddCountBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mGridLayoutManager.setSpanCount(++count);
+
+            }
+        });
+```
+
+效果图：
+
+![img](https://img2020.cnblogs.com/blog/1497956/202006/1497956-20200603151720980-329147989.gif)
+
+
+
+#### 禁止滚动
+
+```java
+textList.setLayoutManager(new GridLayoutManager(context, 5){
+            @Override
+            public boolean canScrollHorizontally() {
+                //禁止水平滚动
+                return false;
+            }
+
+            @Override
+            public boolean canScrollVertically() {
+                //禁止垂直滚动
+                return false;
+            }
+        });
+```
+
+
+
+## ItemDecoration
+
+ItemDecoration只有3个重要的重写方法：
+
+### **getItemOffsets**
+
+用于实现item的上下左右的间距大小
+
+首先先要写一个RecyclerView列表的Demo来进行演示。这里实现了一个item的背景为蓝色的LinearLayoutManager的列表，如下图：![img](https://img2020.cnblogs.com/blog/1497956/202006/1497956-20200602151326329-21263518.png)
+
+给列表的item增加上边距
+
+代码如下：
+
+```java
+public class MainActivity extends AppCompatActivity {
+    private RecyclerView mRecyclerView;
+    private RecyclerViewAdapter mRecyclerViewAdapter;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        mRecyclerView = findViewById(R.id.recyclerview);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerViewAdapter = new RecyclerViewAdapter();
+        mRecyclerView.setAdapter(mRecyclerViewAdapter);
+        addData();
+        /*
+        将itemDecoration添加到RecyclerView。
+        请注意这里是add的,在底层源码里面可以看到ItemDecoration是可以被添加多个的.这里是一个RecyclerView持有ItemDecoration集合。
+        能添加当然就可以移除,所以对应移除的方法
+        mRecyclerView.removeItemDecoration();//根据目标移除
+        mRecyclerView.removeItemDecorationAt();//根据索引index移除
+         */
+        mRecyclerView.addItemDecoration(getItemDecoration());
+
+    }
+
+    private RecyclerView.ItemDecoration getItemDecoration() {
+        return new RecyclerView.ItemDecoration() {
+            @Override
+            public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+                outRect.top = 20;//这里增加了20的上边距
+
+            }
+        };
+    }
+    
+    private void addData() {
+        List<String> list = new ArrayList<>();
+        list.add("猎户座");
+        list.add("织女座");
+        list.add("天马座");
+        list.add("天秤座");
+        list.add("剑鱼座");
+        list.add("飞马座");
+        list.add("三角座");
+        list.add("天琴座");
+        list.add("蛇夫座");
+        mRecyclerViewAdapter.refreshData(list);
+    }
+
+}
+```
+
+
+
+**请注意！**在首次触发的getItemOffsets返回的View都是没有经过measure测量的，所以这里的View没有尺寸值。但是滚动后重新触发的getItemOffsets返回的View就有了尺寸值。但是这里返回的RecyclerView是已经measure测量过了。
+
+
+
+![img](https://img2020.cnblogs.com/blog/1497956/202006/1497956-20200602152224286-2097181297.png)
+
+举一反三，我们可以给左边添加边距
+
+```java
+private RecyclerView.ItemDecoration getItemDecoration() {
+        return new RecyclerView.ItemDecoration() {
+            @Override
+            public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+                outRect.top = 20;
+                outRect.left = 100;
+
+            }
+        };
+    }
+```
+
+![img](https://img2020.cnblogs.com/blog/1497956/202006/1497956-20200602152426396-755761034.png)
+
+#### 指定item
+
+[![复制代码](https://common.cnblogs.com/images/copycode.gif)](javascript:void(0);)
+
+```java
+    private RecyclerView.ItemDecoration getItemDecoration() {
+        return new RecyclerView.ItemDecoration() {
+            @Override
+            public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+                if (parent.getChildAdapterPosition(view) == 0){ //给第一位的item设置50上边距
+                    outRect.top = 50;
+                    return;
+                }
+                if (parent.getChildAdapterPosition(view) == state.getItemCount() -1){ //给最后一位的item设置50下边距
+                    outRect.bottom = 50;　　　　　　　　　　    return;
+                }
+            }
+        };
+    }
+```
+
+![img](https://img2020.cnblogs.com/blog/1497956/202006/1497956-20200602154447579-1012386945.gif)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### **onDraw**
+
+ 在这个方法里绘制的文字、颜色、图形都会比item更低一层，这些绘制效果如果与item重叠，就会被item遮盖
+
+　在重写实现getItemOffsets方法给item增加边距后，我们可以在onDraw方法实现一些文字，图标等等效果。另外Draw其实是自定义View的知识，如果你还没了解过Android 的Draw是如何实现的，你应该先去了解自定义View。
+
+#### 绘制文字
+
+```java
+private RecyclerView.ItemDecoration getItemDecoration() {
+        return new RecyclerView.ItemDecoration() {
+            private Paint paint = new Paint();
+
+            @Override
+            public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+                outRect.top = 20;
+
+            }
+
+            @Override
+            public void onDraw(@NonNull Canvas c, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+                int count = parent.getChildCount();     //获得当前RecyclerView数量
+                paint.setColor(Color.RED);              //设置画笔为红色
+                paint.setTextSize(20);                  //设置文字大小
+                for (int i = 0; i < count; i++) {       //遍历全部item View
+                    View view = parent.getChildAt(i);
+                    int top = view.getTop();            //获得这个item View的top位置
+                    int bottom = view.getBottom();
+                    int left = view.getLeft();
+                    int right = view.getRight();
+                    c.drawText("第" + i, left, top, paint);
+                }
+            }
+        };
+    }
+```
+
+这里有些人会有一些误区，认为这里返回的canvas是某一个item下的canvas。（我之前有这样的理解）实际上这里返回的canvas是整个RecyclerView的canvas，如果你把坐标值固定死，也是在RecyclerView里面某个位置绘制这个文字或者图像。所以，这里需要你自己获取全部Item的坐标值，用获取到的Item坐标值来绘制你需要位置上的内容。
+
+效果图：
+
+![img](https://img2020.cnblogs.com/blog/1497956/202006/1497956-20200602161416149-121451570.png)
+
+
+
+#### 绘制分割线
+
+这里提醒，除了绘制shape分割线，其实还可以使用xml矢量图来绘制图标。
+
+先实现一个shape分割线：
+
+shape_gray_line.xml
+
+```xml
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="line">
+    <stroke android:width="5dp" android:color="@color/yellow_color"/>
+</shape>
+```
+
+
+
+```java
+ private Drawable mDividingLineDrawable;
+
+    private RecyclerView.ItemDecoration getItemDecoration() {
+        mDividingLineDrawable = getDrawable(R.drawable.shape_gray_line);
+        return new RecyclerView.ItemDecoration() {
+
+            @Override
+            public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+                outRect.top = 20;
+
+            }
+
+            @Override
+            public void onDraw(@NonNull Canvas c, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+                int count = parent.getChildCount();
+                parent.getPaddingLeft();
+                for (int i = 0; i < count; i++) {
+                    View view = parent.getChildAt(i);
+                    int top = view.getTop();
+                    int bottom = view.getBottom();
+                    int left = view.getLeft();
+                    int right = view.getRight();
+                    mDividingLineDrawable.setBounds(left , top - 20, right, top);
+                    mDividingLineDrawable.draw(c);
+                }
+            }
+        };
+    }
+```
+
+
+
+![img](https://img2020.cnblogs.com/blog/1497956/202006/1497956-20200602165725973-1132478702.png)
+
+#### 绘制在Item下层
+
+开头我们说过 “ 在这个方法里绘制的文字、颜色、图形都会比item更低一层，这些绘制效果如果与item重叠，就会被item遮盖 ” ，要证明这个效果很简单，我们只需要将绘制内容位置与item重叠一下就能明白效果了。
+
+代码：
+
+
+
+```java
+  @Override
+            public void onDraw(@NonNull Canvas c, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+                int count = parent.getChildCount();
+                paint.setColor(Color.RED);
+                paint.setTextSize(20);
+                for (int i = 0; i < count; i++) {
+                    View view = parent.getChildAt(i);
+                    int top = view.getTop();
+                    int bottom = view.getBottom();
+                    int left = view.getLeft();
+                    int right = view.getRight();
+                    c.drawText("第" + i, left, top + 10, paint);//这里top 增加10 让绘制文字与item重叠
+                }
+            }
+```
+
+
+
+效果图：
+
+可以从这个效果图看到，文字被item覆盖了。
+
+![img](https://img2020.cnblogs.com/blog/1497956/202006/1497956-20200602171850640-868585718.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### **onDrawOver**
+
+
+
+在这个方法绘制的文字、颜色、图形都会比item更高一层，这些绘制效果始终在最上层，不会被遮盖。
+
+onDrawOver在使用上与onDraw上是一致的，说这里不在重复说明怎么绘制内容。 这里只解释下onDrawOver的特性与onDraw对比理解。
+
+```java
+Override
+            public void onDrawOver(@NonNull Canvas c, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+                int count = parent.getChildCount();
+                paint.setColor(Color.RED);
+                paint.setTextSize(20);
+                for (int i = 0; i < count; i++) {
+                    View view = parent.getChildAt(i);
+                    int top = view.getTop();
+                    int bottom = view.getBottom();
+                    int left = view.getLeft();
+                    int right = view.getRight();
+                    c.drawText("第" + i, left, top + 10, paint);//这里top 增加10 让绘制文字与item重叠
+                }
+            }
+```
+
+效果图：
+
+可以从这个效果图看到，文字在最上层。
+
+![img](https://img2020.cnblogs.com/blog/1497956/202006/1497956-20200602174137652-1036010294.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1082,7 +1619,7 @@ https://blog.csdn.net/u013762572/article/details/88954561
  ![img](https://images2018.cnblogs.com/blog/1255627/201803/1255627-20180304234818225-569363107.png)
 
 *布局文件：custom_dialog_layout.xml*
- 
+
 
 ```kotlin
       <TextView
