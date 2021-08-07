@@ -160,6 +160,38 @@ tools可以覆盖android所有的标准属性，将 android: 换成 tools: 即�
 
 
 
+# 布局
+
+
+
+## ConstraintLayout
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # PopupWindow
 
 > 本节给大家带来的是最后一个用于显示信息的UI控件——PopupWindow(悬浮框)，如果你想知道 他长什么样子，你可以打开你手机的QQ，长按列表中的某项，这个时候后弹出一个黑色的小 对话框，这种就是PopupWindow了，和AlertDialog对话框不同的是，他的位置可以是随意的；
@@ -696,7 +728,7 @@ https://blog.csdn.net/u013762572/article/details/88954561
 
 # RecyclerView
 
-
+https://blog.csdn.net/weixin_43130724/article/details/90068112?utm_medium=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7EBlogCommendFromMachineLearnPai2%7Edefault-1.base&depth_1-utm_source=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7EBlogCommendFromMachineLearnPai2%7Edefault-1.base
 
 ## LayoutManager
 

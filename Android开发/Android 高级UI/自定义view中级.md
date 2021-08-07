@@ -3926,7 +3926,13 @@ Android` 版本在 `4.0(API Level 14)` 到 `4.4.2(API Level 19)` 使用 `Android
 
 #### 资源
 
+Actity版本的
+
 https://github.com/ZXM250250/Animation
+
+碎片版本的
+
+[android 共享元素 activity与fragment方式_从零点零开始-CSDN博客_activity fragment 共享元素](https://blog.csdn.net/cyuyanshujujiegou/article/details/76514203)
 
 Transitiondemo 模块
 

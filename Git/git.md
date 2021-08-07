@@ -152,10 +152,15 @@ git pull origin main --allow-unrelated-histories
 #### OpenSSL SSL_read: Connection was reset, errno 10054
 
 ```git
+
 git config --global http.sslVerify false
 ```
 
 ## 练习网站
 
 https://learngitbranching.js.org/?locale=zh_CN
+
+
+
+
 
