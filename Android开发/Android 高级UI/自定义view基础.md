@@ -5969,3 +5969,21 @@ https://www.jianshu.com/p/e8f14a1f16a3
 
 ## SwipeRefreshLayout
 
+
+
+
+
+
+
+
+
+# View的加载
+
+```kotlin
+// 第一种
+View layoutView = View.inflate(this , R.layout.activity_main , null) ;
+// 第2种
+layoutView = LayoutInflater.from(this).inflate(R.layout.activity_main , null) ;
+// 第3种
+layoutView = LayoutInflater.from(this).inflate(R.layout.activity_main , null , false) ;
+```

@@ -714,9 +714,50 @@ btn_show_menu.setOnClickListener(new View.OnClickListener() {
 
 https://blog.csdn.net/u013762572/article/details/88954561
 
+系统是如何计算当前所在页面(position)，以及如何计算偏移百分比(positionOffset)
+
+![img](https://upload-images.jianshu.io/upload_images/2007513-258e54bcdfd2c33f.gif?imageMogr2/auto-orient/strip|imageView2/2/w/744)
 
 
 
+![image-20210809100458974](../../%E5%9B%BE%E5%BA%93/Android%20%E5%9F%BA%E7%A1%80/image-20210809100458974.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## onPageScrolled
+
+```java
+@Override
+public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+        //position 当前所在页面
+        //positionOffset 当前所在页面偏移百分比
+        //positionOffsetPixels 当前所在页面偏移量
+            }
+```
 
 
 
